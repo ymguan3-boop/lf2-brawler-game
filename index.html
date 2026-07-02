@@ -613,15 +613,15 @@ class Game{
   }
   setup(){
     window.addEventListener('keydown',e=>{
-      const k=e.key.toLowerCase();
+      const k=e.key.length===1?e.key.toLowerCase():e.key;
       this.keys[k]=true;
       if(['z','x','c','v','s','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k)){
         this.buf.push({k,t:this.frame});if(this.buf.length>10)this.buf.shift()
       }
-      if(k==='r')this.reset();
+      if(k==='r'||k==='R')this.reset();
       e.preventDefault();
     });
-    window.addEventListener('keyup',e=>{this.keys[e.key.toLowerCase()]=false});
+    window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;this.keys[k]=false});
     this.setupMobile();
   }
   setupMobile(){
