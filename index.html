@@ -1046,6 +1046,8 @@ function startGame(){
   const name=document.getElementById('playerNameInput').value.trim();
   if(!name){document.getElementById('playerNameInput').style.borderColor='#f44';return}
   document.getElementById('nameModal').classList.remove('active');
+  document.getElementById('playerNameInput').blur();
+  document.activeElement&&document.activeElement.blur();
   document.getElementById('leaderboardBtn').style.display='block';
   if(!gameInstance){
     loadHeroSprites(()=>{loadXiaoguai1Sprites(()=>{loadXiaoguai2Sprites(()=>{loadXiaoguai3Sprites(()=>{loadXiaowangSprites(()=>{loadSceneImages(()=>{loadItemImages(()=>{
