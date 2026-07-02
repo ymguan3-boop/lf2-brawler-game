@@ -49,21 +49,22 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 #leaderboardBtn{position:fixed;top:10px;right:10px;z-index:100;padding:8px 16px;border:1px solid rgba(240,192,64,0.4);border-radius:20px;background:rgba(0,0,0,0.6);color:#f0c040;font-size:12px;cursor:pointer;display:none}
 #leaderboardBtn:hover{background:rgba(240,192,64,0.2)}
 #mobileControls{display:none;position:fixed;bottom:0;left:0;width:100%;height:200px;z-index:50;pointer-events:none}
-.dpad{position:absolute;left:20px;bottom:20px;width:120px;height:120px;pointer-events:auto}
+.dpad{position:absolute;left:20px;bottom:80px;width:120px;height:120px;pointer-events:auto}
 .dpad-btn{position:absolute;width:40px;height:40px;border-radius:8px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);display:flex;justify-content:center;align-items:center;color:#fff;font-size:18px;user-select:none;-webkit-user-select:none;touch-action:none}
 .dpad-btn:active{background:rgba(255,255,255,0.35)}
 .dpad-up{left:40px;top:0}
 .dpad-down{left:40px;bottom:0}
 .dpad-left{left:0;top:40px}
 .dpad-right{right:0;top:40px}
-.action-btns{position:absolute;right:20px;bottom:20px;width:140px;height:170px;pointer-events:auto}
+.action-btns{position:absolute;right:20px;bottom:80px;width:132px;height:132px;pointer-events:auto}
 .act-btn{position:absolute;width:44px;height:44px;border-radius:50%;display:flex;justify-content:center;align-items:center;color:#fff;font-size:13px;font-weight:bold;user-select:none;-webkit-user-select:none;touch-action:none;border:2px solid rgba(255,255,255,0.3)}
 .act-btn:active{opacity:0.7}
-.btn-z{left:0;top:48px;background:rgba(255,100,100,0.4)}
-.btn-x{right:0;top:48px;background:rgba(100,100,255,0.4)}
-.btn-a{left:48px;top:0;background:rgba(255,200,50,0.4)}
-.btn-s{left:48px;bottom:0;background:rgba(100,200,100,0.4)}
-.btn-r{left:50%;bottom:-30px;transform:translateX(-50%);background:rgba(200,200,200,0.3);font-size:11px;width:36px;height:24px;border-radius:12px}
+.btn-z{left:0;top:44px;background:rgba(255,100,100,0.4)}
+.btn-x{right:0;top:44px;background:rgba(100,100,255,0.4)}
+.btn-a{left:44px;top:0;background:rgba(255,200,50,0.4)}
+.btn-s{left:44px;bottom:0;background:rgba(100,200,100,0.4)}
+.btn-r{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);background:rgba(200,200,200,0.35);font-size:11px;width:40px;height:26px;border-radius:13px;color:#fff;display:flex;justify-content:center;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none;border:1px solid rgba(255,255,255,0.3);pointer-events:auto}
+.btn-r:active{opacity:0.7}
 @media(max-width:1000px){canvas{width:100%;height:auto;aspect-ratio:16/9}}
 @media(pointer:coarse){#mobileControls{display:block}#leaderboardBtn{display:block}}
 </style>
@@ -123,8 +124,8 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 <div class="act-btn btn-x" data-key="x">X</div>
 <div class="act-btn btn-a" data-key="a">A</div>
 <div class="act-btn btn-s" data-key="s">S</div>
-<div class="act-btn btn-r" data-key="r">R</div>
 </div>
+<div class="act-btn btn-r" data-key="r">R</div>
 </div>
 
 <script>
@@ -638,7 +639,7 @@ class Game{
     });
     document.querySelectorAll('.act-btn').forEach(btn=>{
       const key=btn.dataset.key;
-      const onStart=()=>{this.keys[key]=true};
+      const onStart=()=>{this.keys[key]=true;if(key==='r')this.reset()};
       const onEnd=()=>{this.keys[key]=false};
       btn.addEventListener('touchstart',e=>{e.preventDefault();onStart()});
       btn.addEventListener('touchend',e=>{e.preventDefault();onEnd()});
