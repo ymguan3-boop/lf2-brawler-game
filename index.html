@@ -140,7 +140,7 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 // ============================================================
 // CONSTANTS
 // ============================================================
-const CW=960,CH=540,ROAD_TOP=180,ROAD_BOTTOM=530,LEVEL_LEN=4000;
+const CW=960,CH=540,ROAD_TOP=324,ROAD_BOTTOM=530,LEVEL_LEN=4000;
 const KEY={L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',D:'ArrowDown',P:'z',K:'x',A:'a',S:'s'};
 const HERO={HP:500,MP:200,SPD:3.5,JUMP:-9,W:40,H:64,ATK_RNG:100,ATK_DMG:25,MP_REGEN:0.2};
 const SCALE=1.56;
@@ -162,7 +162,7 @@ const ENEMY_CFG={
     anim:{idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
       attack:{frames:3,dur:10,loop:false},hurt:{frames:1,dur:6,loop:false},death:{frames:3,dur:12,loop:false}}},
   xiaoguai4:{name:'小怪4',HP:300,SPD:1.2,DMG:20,W:44,H:68,col:'#f8a',
-    anim:{idle:{frames:1,dur:14,loop:true},walk:{frames:1,dur:8,loop:true},
+    anim:{idle:{frames:2,dur:14,loop:true},walk:{frames:2,dur:8,loop:true},
       attack:{frames:3,dur:10,loop:false},hurt:{frames:1,dur:6,loop:false},death:{frames:2,dur:15,loop:false}}},
   xiaowang:{name:'小王',HP:800,SPD:0.8,DMG:20,W:50,H:70,col:'#f44',
     anim:{idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
@@ -398,12 +398,12 @@ function drawXiaoguai3(ctx,x,y,fIdx,facing,flash,state){
 const xiaoguai4Sprites={};
 const XIAOGUAI4_PATH='小怪4動作包/';
 const XIAOGUAI4_STATE_FILES={
-  walk:['小怪4走路_2.png'],
+  walk:['小怪4走路_1.png','小怪4走路_2.png'],
   attack:['小怪4攻擊_1.png','小怪4攻擊_2.png','小怪4攻擊_3.png'],
   hurt:['小怪4被攻擊.png'],
   death:['小怪4死亡_1.png','小怪4死亡_2.png'],
 };
-XIAOGUAI4_STATE_FILES.idle=['小怪4走路_2.png'];
+XIAOGUAI4_STATE_FILES.idle=['小怪4走路_1.png','小怪4走路_2.png'];
 function loadXiaoguai4Sprites(cb){
   let loaded=0,total=0;
   Object.keys(XIAOGUAI4_STATE_FILES).forEach(state=>{
