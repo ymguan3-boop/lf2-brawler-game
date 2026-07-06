@@ -342,15 +342,16 @@ function loadXiaoguai2Sprites(cb){
 }
 function drawXiaoguai2(ctx,x,y,fIdx,facing,flash,state){
   const img=xiaoguai2Sprites[state]&&xiaoguai2Sprites[state][fIdx];
+  const flip=(state==='attack')?facing>0:facing<0;
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.translate(x,y);
-    if(facing<0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
+    if(flip)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
     const scale=Math.min(50/sw,64/sh)*SCALE*1.95;
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
-    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.95,SCALE*1.95);
+    ctx.save();ctx.translate(x,y);if(flip)ctx.scale(-1,1);ctx.scale(SCALE*1.95,SCALE*1.95);
     ctx.fillStyle='#8af';ctx.fillRect(-10,-24,20,24);
     ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-30,8,0,Math.PI*2);ctx.fill();
     ctx.restore();
