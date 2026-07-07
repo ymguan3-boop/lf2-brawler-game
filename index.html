@@ -542,14 +542,14 @@ const GUGU_PATH='招喚姑姑技能動作包/';
 const GUGU_STATE_FILES={
   walk:['姑姑走路_1.png','姑姑走路_2.png','姑姑走路_3.png'],
   attack:['姑姑攻擊_1.png','姑姑攻擊_2.png','姑姑攻擊_3.png','姑姑攻擊_4.png'],
-  ultimate:['姑姑大絕招_1.png','姑姑大絕招_2.png','姑姑大絕招_3.png','姑姑大絕招_4.png','姑姑大絕招_5.png','姑姑大絕招_6.png','姑姑大絕招_7.png','姑姑大絕招_8.png','姑姑大絕招_9.png','姑姑大絕招_10.png','姑姑大絕招_11.png','姑姑大絕招_12.png','姑姑大絕招_13.png','姑姑大絕招_14.png','姑姑大絕招_15.png'],
+  ultimate:['姑姑大絕招_1.png','姑姑大絕招_2.png','姑姑大絕招_3.png','姑姑大絕招_4.png','姑姑大絕招_5.png','姑姑大絕招_6.png','姑姑大絕招_7.png','姑姑大絕招_8.png','姑姑大絕招_9.png','姑姑大絕招_10.png','姑姑大絕招_11.png','姑姑大絕招_12.png'],
   hurt:['姑姑被攻擊.png'],
   death:['姑姑死亡_1.png','姑姑死亡_2.png','姑姑死亡_3.png'],
 };
 GUGU_STATE_FILES.idle=['姑姑走路_1.png','姑姑走路_2.png','姑姑走路_3.png'];
 const GUGU_ANIM={
   idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
-  attack:{frames:4,dur:10,loop:false},ultimate:{frames:15,dur:6,loop:false},
+  attack:{frames:4,dur:10,loop:false},ultimate:{frames:12,dur:15,loop:false},
   hurt:{frames:1,dur:6,loop:false},death:{frames:3,dur:12,loop:false}
 };
 function loadGuguSprites(cb){
@@ -570,7 +570,7 @@ function drawGugu(ctx,x,y,fIdx,facing,flash,state){
     ctx.save();ctx.translate(x,y);
     if(facing>0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const scale=Math.min(50/sw,64/sh)*SCALE*1.32;
+    const scale=Math.min(50/sw,64/sh)*SCALE*1.32*(state==='ultimate'?1.2:1);
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
@@ -764,7 +764,7 @@ class Game{
     this.go=false;this.win=false;this.kills=0;this.hitStop=0;
     this.timeLeft=GAME_TIME;this.timeAcc=0;this.score=0;
     this.spawnTimer=SPAWN_INTERVAL;this.playerName='';this.lbSaved=false;
-    this.paused=false;this.gugu=null;this.guguCD=0;this.guguHealTimer=600;
+    this.paused=false;this.gugu=null;this.guguCD=0;
     window._game=this;
     this.setup();
   }
@@ -831,9 +831,8 @@ class Game{
   summonGugu(){
     const h=this.hero;
     this.gugu={x:h.x+60,y:h.y,vx:0,vy:0,w:40,h:60,hp:Math.floor(h.maxHp*0.5),maxHp:Math.floor(h.maxHp*0.5),
-      facing:1,flash:0,hitCD:0,atkCD:0,deathTimer:0,
-      animState:'idle',animFrame:0,animTimer:0,animLoop:true,animDone:false,animCfg:GUGU_ANIM,
-      healTimer:600,attackCount:0};
+      facing:1,flash:0,hitCD:0,atkCD:0,ultCD:0,deathTimer:0,attackCount:0,
+      animState:'idle',animFrame:0,animTimer:0,animLoop:true,animDone:false,animCfg:GUGU_ANIM};
     this.guguCD=0;
     sfx('combo');this.shake=5;
     this.addP(h.x+60,h.y-30,'#f0f',15);
@@ -847,9 +846,9 @@ class Game{
       if(g.animDone){this.guguCD=1800;this.gugu=null;return}
       this.applyBounds(g);return;
     }
-    g.hitCD--;g.flash--;g.atkCD--;g.healTimer--;
-    if(g.healTimer<=0){
-      g.healTimer=600;
+    g.hitCD--;g.flash--;g.atkCD--;g.ultCD--;
+    if(g.ultCD<=0&&g.attackCount>=6){
+      g.attackCount=0;g.ultCD=600;
       startAnim(g,'ultimate');g.atkCD=GUGU_ANIM.ultimate.dur*GUGU_ANIM.ultimate.frames+5;
       g.healing=true;sfx('pick');
     }
@@ -857,7 +856,7 @@ class Game{
       g.healing=false;
       h.hp=Math.min(h.maxHp,h.hp+Math.floor(h.maxHp*0.3));
       h.flash=20;h.flashColor='#ff0';
-      for(let i=0;i<15;i++){this.pts.push({x:h.x,y:h.y-20-i*12,vy:-3-i*0.5,vx:(Math.random()-0.5)*1.5,life:1,decay:0.02,color:'#ff0',size:4+i*0.5})}
+      for(let i=0;i<30;i++){this.pts.push({x:h.x,y:h.y-20-i*24,vy:-3-i*1.0,vx:(Math.random()-0.5)*1.5,life:1,decay:0.02,color:'#ff0',size:(4+i*0.4)*1.2})}
       sfx('levelup');
     }
     if(g.hitCD>0&&g.animState!=='hurt')startAnim(g,'hurt');
@@ -868,7 +867,7 @@ class Game{
       const dx=nearest.x-g.x,dy=nearest.y-g.y,dist=Math.sqrt(dx*dx+dy*dy);
       g.facing=dx>0?1:-1;
       if(g.atkCD<=0&&dist<80){
-        startAnim(g,'attack');g.atkCD=GUGU_ANIM.attack.dur*GUGU_ANIM.attack.frames+3;sfx('hit');
+        startAnim(g,'attack');g.atkCD=Math.floor((GUGU_ANIM.attack.dur*GUGU_ANIM.attack.frames)/2)+2;g.attackCount++;sfx('hit');
       }else if(dist>30){
         g.vx=(dx/dist)*3.5;g.vy=(dy/dist)*3.5;startAnim(g,'walk');
       }else{g.vx=0;g.vy=0}
@@ -1279,7 +1278,7 @@ class Game{
     this.go=false;this.win=false;this.cc=0;this.ct=0;this.cd=0;this.kills=0;this.camX=0;this.shake=0;this.hitStop=0;
     this.timeLeft=GAME_TIME;this.timeAcc=0;this.score=0;
     this.spawnTimer=SPAWN_INTERVAL;this.lbSaved=false;this.paused=false;
-    this.gugu=null;this.guguCD=0;this.guguHealTimer=600;
+    this.gugu=null;this.guguCD=0;
     pendingLevelUp=false;
   }
   start(){const loop=()=>{this.update();this.render();this.animId=requestAnimationFrame(loop)};loop()}
