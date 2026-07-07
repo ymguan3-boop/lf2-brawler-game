@@ -650,7 +650,7 @@ function drawBg(ctx,cx){
     const iw=sceneImg.naturalWidth,ih=sceneImg.naturalHeight;
     const scale=Math.max(CW/iw,CH/ih);
     const dw=iw*scale,dh=ih*scale;
-    const maxOff=Math.max(0,dw-CW);
+    const maxOff=Math.max(0,(dw-CW)/2);
     const off=Math.min(cx*0.15,maxOff);
     ctx.drawImage(sceneImg,(CW-dw)/2-off,(CH-dh)/2,dw,dh);
     return;
@@ -1261,8 +1261,8 @@ class Game{
       drawGugu(ctx,gx,gy,g.animFrame||0,g.facing||1,g.flash>0,g.animState||'idle');
       const bw=40,bh=5;
       ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
-      ctx.fillText('姑姑',gx,gy-100);
-      drawHB(ctx,gx-bw/2,gy-115,bw,bh,g.hp,g.maxHp,'#a855f7');
+      ctx.fillText('姑姑',gx,gy-115);
+      drawHB(ctx,gx-bw/2,gy-130,bw,bh,g.hp,g.maxHp,'#a855f7');
     }
     if(this.gugu&&this.gugu.hp<=0&&!this.gugu.animDone){
       const g=this.gugu,gx=Math.round(g.x-this.camX),gy=Math.round(g.y);
