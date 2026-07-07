@@ -12,7 +12,7 @@ body{display:flex;justify-content:center;align-items:center;background:radial-gr
 h1{font-size:42px;font-weight:900;margin-bottom:4px;background:linear-gradient(135deg,#f0c040,#ff6b35,#ff4444,#a855f7,#3b82f6);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 3s ease infinite;letter-spacing:4px}
 .sub{color:#888;font-size:16px;letter-spacing:2px;margin-bottom:12px}
 #border{display:inline-block;padding:4px;border-radius:8px;background:linear-gradient(135deg,#f0c040,#ff6b35,#a855f7,#3b82f6);background-size:400% 400%;animation:gradientShift 4s ease infinite}
-canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
+canvas{display:block;border-radius:6px;background:#000;width:540px;height:660px}
 .controls{margin-top:12px;color:#888;font-size:12px}
 .controls span{display:inline-block;background:rgba(255,255,255,0.05);padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);animation:fadeIn 0.8s ease-out 0.6s both;line-height:1.8}
 @keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -22,21 +22,21 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 @keyframes cardHover{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;justify-content:center;align-items:center;flex-direction:column}
 .modal-overlay.active{display:flex}
-.modal-box{background:linear-gradient(135deg,#1a1a2e,#2a2a4e);border:2px solid #f0c040;border-radius:16px;padding:40px;max-width:500px;width:90%;text-align:center;animation:slideUp 0.4s ease-out}
-.modal-box h2{color:#f0c040;font-size:28px;margin-bottom:16px}
+.modal-box{background:linear-gradient(135deg,#1a1a2e,#2a2a4e);border:2px solid #f0c040;border-radius:16px;padding:30px;max-width:380px;width:90%;text-align:center;animation:slideUp 0.4s ease-out}
+.modal-box h2{color:#f0c040;font-size:22px;margin-bottom:14px}
 .modal-box input{width:80%;padding:12px 20px;font-size:18px;border:2px solid #555;border-radius:8px;background:#0a0a12;color:#fff;text-align:center;outline:none;margin-bottom:16px}
 .modal-box input:focus{border-color:#f0c040}
 .modal-box button{padding:12px 40px;font-size:18px;font-weight:bold;border:none;border-radius:8px;background:linear-gradient(135deg,#f0c040,#ff6b35);color:#000;cursor:pointer;transition:all 0.2s}
 .modal-box button:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(240,192,64,0.5)}
 .modal-box button:disabled{opacity:0.4;cursor:not-allowed;transform:none}
 .card-container{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:20px}
-.ability-card{width:140px;padding:20px 12px;border:2px solid #555;border-radius:12px;background:#0a0a2e;cursor:pointer;transition:all 0.3s;animation:cardHover 2s ease-in-out infinite}
+.ability-card{width:100px;padding:14px 8px;border:2px solid #555;border-radius:10px;background:#0a0a2e;cursor:pointer;transition:all 0.3s;animation:cardHover 2s ease-in-out infinite}
 .ability-card:nth-child(2){animation-delay:0.3s}
 .ability-card:nth-child(3){animation-delay:0.6s}
 .ability-card:hover{border-color:#f0c040;transform:translateY(-8px);box-shadow:0 8px 25px rgba(240,192,64,0.3)}
-.ability-card .icon{font-size:36px;margin-bottom:8px}
-.ability-card .name{color:#f0c040;font-size:14px;font-weight:bold;margin-bottom:6px}
-.ability-card .desc{color:#aaa;font-size:11px;line-height:1.4}
+.ability-card .icon{font-size:28px;margin-bottom:6px}
+.ability-card .name{color:#f0c040;font-size:12px;font-weight:bold;margin-bottom:4px}
+.ability-card .desc{color:#aaa;font-size:10px;line-height:1.3}
 .lb-container{max-height:400px;overflow-y:auto;margin-top:16px}
 .lb-row{display:flex;justify-content:space-between;padding:8px 16px;border-bottom:1px solid rgba(255,255,255,0.1);color:#fff;font-size:14px}
 .lb-row:nth-child(1){color:#f0c040}
@@ -81,7 +81,7 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 <h1>&#x2694; 小小冒險家 &#x2694;</h1>
 <p class="sub">道路大亂鬥 &mdash; LF2 風格</p>
 <div id="loadingOverlay"><div id="loadingText">LOADING...</div><div id="loadingBar"><div id="loadingFill"></div></div></div>
-<div id="border"><canvas id="game" width="960" height="540"></canvas></div>
+<div id="border"><canvas id="game" width="540" height="660"></canvas></div>
 <p class="controls"><span>
 ↑↓←→=自由行走 | Z=出拳 | X=踢擊 | A=大絕招(冷卻10秒) | S=使用道具 | Z+X=招喚姑姑 | R=重新開始
 </span></p>
@@ -165,7 +165,7 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 // ============================================================
 // CONSTANTS
 // ============================================================
-const CW=960,CH=540,ROAD_TOP=220,ROAD_BOTTOM=530,LEVEL_LEN=4000;
+const CW=540,CH=660,ROAD_TOP=270,ROAD_BOTTOM=640,LEVEL_LEN=4000;
 const KEY={L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',D:'ArrowDown',P:'z',K:'x',A:'a',S:'s'};
 const HERO={HP:500,MP:200,SPD:3.5,JUMP:-9,W:40,H:64,ATK_RNG:100,ATK_DMG:25,MP_REGEN:0.2};
 const SCALE=1.56;
@@ -224,7 +224,8 @@ const ABILITY_DEFS=[
   {id:'kickCombo',name:'踢擊連擊',icon:'&#x1F9B6;',desc:'每選擇一次踢擊命中判定+1次，可累計',apply:h=>{h.kickBonusHits=(h.kickBonusHits||0)+1}},
   {id:'ultCombo',name:'大絕連擊數增加',icon:'&#x26A1;',desc:'每選擇一次大絕招COMBO+1，可累計',apply:h=>{h.ultBonusHits=(h.ultBonusHits||0)+1}},
   {id:'atkDamage',name:'攻擊傷害+10%',icon:'&#x1F525;',desc:'所有攻擊擊中敵人傷害+10%，可累計',apply:h=>{h.atkDmgMul=(h.atkDmgMul||1)+0.1}},
-  {id:'defense',name:'防禦+10%',icon:'&#x1F6E1;&#xFE0F;',desc:'敵人造成主角的傷害-10%，可累計',apply:h=>{h.defMul=(h.defMul||1)-0.1}}
+  {id:'defense',name:'防禦+10%',icon:'&#x1F6E1;&#xFE0F;',desc:'敵人造成主角的傷害-10%，可累計',apply:h=>{h.defMul=(h.defMul||1)-0.1}},
+  {id:'atkRange',name:'攻擊範圍擴大',icon:'&#x1F3F9;',desc:'攻擊範圍+10%，可累計',apply:h=>{h.atkRngMul=(h.atkRngMul||1)+0.1}}
 ];
 
 // ============================================================
@@ -550,7 +551,7 @@ GUGU_STATE_FILES.idle=['姑姑走路_1.png','姑姑走路_2.png','姑姑走路_3
 const GUGU_ANIM={
   idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
   attack:{frames:4,dur:10,loop:false},ultimate:{frames:15,dur:10,loop:false},
-  hurt:{frames:1,dur:6,loop:false},death:{frames:3,dur:12,loop:false}
+  hurt:{frames:1,dur:6,loop:false},death:{frames:3,dur:15,loop:false}
 };
 function loadGuguSprites(cb){
   let loaded=0,total=0;
@@ -570,11 +571,11 @@ function drawGugu(ctx,x,y,fIdx,facing,flash,state){
     ctx.save();ctx.translate(x,y);
     if(facing>0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const scale=Math.min(50/sw,64/sh)*SCALE*1.32*(state==='ultimate'?1.69:1);
+    const scale=Math.min(50/sw,64/sh)*SCALE*1.32*(state==='ultimate'?1.69:1.1);
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
-    ctx.save();ctx.translate(x,y);if(facing>0)ctx.scale(-1,1);ctx.scale(SCALE*1.32,SCALE*1.32);
+    ctx.save();ctx.translate(x,y);if(facing>0)ctx.scale(-1,1);ctx.scale(SCALE*1.32*1.1,SCALE*1.32*1.1);
     ctx.fillStyle='#f0f';ctx.fillRect(-10,-24,20,24);
     ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-30,8,0,Math.PI*2);ctx.fill();
     ctx.restore();
@@ -599,7 +600,7 @@ function drawHealFx(ctx,x,y,fIdx,scale){
     ctx.save();ctx.globalAlpha=0.6;
     const sw=img.naturalWidth,sh=img.naturalHeight;
     const s=Math.max(72/sw,96/sh)*scale*2.4;
-    ctx.drawImage(img,x-sw*s/2,y-sh*s+20,sw*s,sh*s);
+    ctx.drawImage(img,x-sw*s/2,y-sh*s+35,sw*s,sh*s);
     ctx.restore();
   }
 }
@@ -712,7 +713,7 @@ function makeHero(){
   return{x:150,y,vx:0,vy:0,w:HERO.W,h:HERO.H,hp:HERO.HP,maxHp:HERO.HP,mp:HERO.MP,maxMp:HERO.MP,
     facing:1,heldItems:[],itemCD:0,comboChain:0,hitCD:0,atkCD:0,flash:0,ultHits:0,
     ultCD:0,xp:0,level:1,xpToNext:XP_PER_LEVEL,
-    punchSpdMul:1,kickBonusHits:0,ultBonusHits:0,atkDmgMul:1,defMul:1,
+    punchSpdMul:1,kickBonusHits:0,ultBonusHits:0,atkDmgMul:1,defMul:1,atkRngMul:1,
     animState:'idle',animFrame:0,animTimer:0,animLoop:true,animDone:false,animCfg:getHeroAnim(),animCustomDur:0};
 }
 function makeEnemy(type,x,side){
@@ -755,7 +756,7 @@ let pendingLevelUp=false;
 function showLevelUpCards(hero){
   pendingLevelUp=true;
   const container=document.getElementById('cardContainer');
-  document.getElementById('levelUpTitle').textContent='Lv.'+hero.level+' 升級！選擇能力';
+  document.getElementById('levelUpTitle').textContent='Lv.'+hero.level+' 升級！';
   const shuffled=ABILITY_DEFS.slice().sort(()=>Math.random()-0.5);
   const picked=shuffled.slice(0,3);
   container.innerHTML=picked.map(ab=>`<div class="ability-card" onclick="selectCard('${ab.id}')"><div class="icon">${ab.icon}</div><div class="name">${ab.name}</div><div class="desc">${ab.desc}</div></div>`).join('');
@@ -989,7 +990,7 @@ class Game{
     if(h.atkCD>0&&!h.animDone&&h.animState==='kick'&&h.hitCD<=0){
       const hits=1+h.kickBonusHits;
       if(h.animFrame===1&&h.animTimer===ANIM.kick.dur){
-        for(let i=0;i<hits;i++)this.checkAtkHit(h,Math.floor((HERO.ATK_DMG+10)*h.atkDmgMul));
+        for(let i=0;i<hits;i++)this.checkAtkHit(h,Math.floor((HERO.ATK_DMG+10)*h.atkDmgMul),i>0);
       }
     }
     if(this.keys[KEY.A]&&h.atkCD<=0&&h.ultCD<=0){
@@ -1012,10 +1013,11 @@ class Game{
     }
     this.applyBounds(h);
   }
-  checkAtkHit(h,dmg){
+  checkAtkHit(h,dmg,ignoreHitCD){
+    const rng=HERO.ATK_RNG*(h.atkRngMul||1);
     this.enemies.forEach(e=>{
-      if(e.hp<=0||e.hitCD>0)return;
-      if(Math.abs(e.x-h.x)<HERO.ATK_RNG&&Math.abs(e.y-h.y)<80&&((h.facing>0&&e.x>h.x)||(h.facing<0&&e.x<h.x))){
+      if(e.hp<=0||(!ignoreHitCD&&e.hitCD>0))return;
+      if(Math.abs(e.x-h.x)<rng&&Math.abs(e.y-h.y)<80&&((h.facing>0&&e.x>h.x)||(h.facing<0&&e.x<h.x))){
         e.hp-=dmg;e.hitCD=22;e.flash=10;e.stun=18;e.vx=0;e.vy=0;
         this.cc++;this.ct=60;this.cd=45;
         const ctX=(h.x+h.facing*30+e.x)/2,ctY=h.y-25;
@@ -1029,11 +1031,11 @@ class Game{
     });
   }
   checkAtkHitUlt(h,dmg,maxHits){
-    let hitCount=0;
+    let hitCount=0;const rng=HERO.ATK_RNG*(h.atkRngMul||1);
     this.enemies.forEach(e=>{
       if(e.hp<=0||hitCount>=maxHits)return;
       const dx=Math.abs(e.x-h.x),dy=Math.abs(e.y-h.y);
-      if(dx<HERO.ATK_RNG+50&&dy<90&&((h.facing>0&&e.x>h.x)||(h.facing<0&&e.x<h.x))){
+      if(dx<rng+50&&dy<90&&((h.facing>0&&e.x>h.x)||(h.facing<0&&e.x<h.x))){
         e.hp-=dmg;e.hitCD=18;e.flash=6;e.stun=15;e.vx=0;e.vy=0;
         this.cc++;h.ultHits=(h.ultHits||0)+1;this.ct=60;this.cd=45;hitCount++;
         const ctX=(h.x+h.facing*30+e.x)/2,ctY=h.y-25;
@@ -1270,17 +1272,17 @@ class Game{
     }
     drawParticles(ctx,this.pts,this.camX);
     const h=this.hero;
-    drawHB(ctx,20,20,300,24,h.hp,h.maxHp,'#e74c3c','HP');
+    drawHB(ctx,20,20,220,24,h.hp,h.maxHp,'#e74c3c','HP');
     const ultMax=ULT_COOLDOWN,ultCur=h.ultCD>0?ULT_COOLDOWN-h.ultCD:ULT_COOLDOWN;
-    drawHB(ctx,20,50,200,16,ultCur,ultMax,h.ultCD<=0?'#f80':'#888','CD');
+    drawHB(ctx,20,50,150,16,ultCur,ultMax,h.ultCD<=0?'#f80':'#888','CD');
     const xpR=h.xpToNext>0?h.xp/h.xpToNext:0;
-    drawHB(ctx,20,72,200,12,h.xp,h.xpToNext,'#9b59b6','XP');
+    drawHB(ctx,20,72,150,12,h.xp,h.xpToNext,'#9b59b6','XP');
     ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='left';
-    ctx.fillText('Lv.'+h.level,228,82);
-    ctx.fillText(' '+h.playerName,228,82);
+    ctx.fillText('Lv.'+h.level,178,82);
+    ctx.fillText(' '+h.playerName,178,82);
     if(this.guguCD>0){
-      drawHB(ctx,20,90,200,10,1800-this.guguCD,1800,'#f0f','姑姑CD');
-      ctx.fillStyle='#f0f';ctx.font='11px sans-serif';ctx.fillText(Math.ceil(this.guguCD/60)+'s',225,99);
+      drawHB(ctx,20,90,150,10,1800-this.guguCD,1800,'#f0f','姑姑CD');
+      ctx.fillStyle='#f0f';ctx.font='11px sans-serif';ctx.fillText(Math.ceil(this.guguCD/60)+'s',175,99);
     }else if(!this.gugu||this.gugu.hp<=0){
       ctx.fillStyle='#f0f';ctx.font='bold 11px sans-serif';ctx.fillText('姑姑可招喚(Z+X)',20,99);
     }
@@ -1324,7 +1326,7 @@ class Game{
 // ============================================================
 const canvas=document.getElementById('game');
 function resize(){
-  const mw=Math.min(window.innerWidth-40,960),r=540/960;
+  const mw=Math.min(window.innerWidth-40,540),r=660/540;
   canvas.style.width=mw+'px';canvas.style.height=(mw*r)+'px'
 }
 window.addEventListener('resize',resize);resize();
