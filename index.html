@@ -599,7 +599,7 @@ function drawHealFx(ctx,x,y,fIdx,scale){
     ctx.save();ctx.globalAlpha=0.6;
     const sw=img.naturalWidth,sh=img.naturalHeight;
     const s=Math.max(72/sw,96/sh)*scale*2.4;
-    ctx.drawImage(img,x-sw*s/2,y-sh*s,sw*s,sh*s);
+    ctx.drawImage(img,x-sw*s/2,y-sh*s+20,sw*s,sh*s);
     ctx.restore();
   }
 }
@@ -875,10 +875,9 @@ class Game{
       startAnim(g,'ultimate');g.atkCD=GUGU_ANIM.ultimate.dur*GUGU_ANIM.ultimate.frames+5;
       g.healing=true;sfx('pick');
     }
-    if(g.healing&&g.animDone){
+    if(g.healing&&g.animState==='ultimate'&&g.animDone){
       g.healing=false;
       h.hp=Math.min(h.maxHp,h.hp+Math.floor(h.maxHp*0.3));
-      h.flash=20;h.flashColor='#ff0';
       this.healFx={frame:0,timer:HEAL_FX_DUR,active:true};
       g.animState='idle';g.animDone=false;
       sfx('levelup');
