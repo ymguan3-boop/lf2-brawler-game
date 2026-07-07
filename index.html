@@ -95,6 +95,13 @@ canvas{display:block;border-radius:6px;background:#000;width:960px;height:540px}
 <input type="text" id="playerNameInput" placeholder="輸入玩家姓名" maxlength="12" autocomplete="off">
 <br><br>
 <button id="startBtn" onclick="goToCharSelect()">開始遊戲</button>
+<div style="margin-top:20px;padding:12px;background:rgba(255,255,255,0.08);border-radius:8px;text-align:left;font-size:12px;color:#aaa;line-height:1.8">
+<div>↑↓←→ = 自由行走</div>
+<div>Z = 出拳 | X = 踢擊</div>
+<div>A = 大絕招（冷卻10秒）</div>
+<div>S = 使用道具 | R = 重新開始</div>
+<div>Z+X = 招喚姑姑（姑姑死亡後30秒CD）</div>
+</div>
 </div>
 </div>
 
@@ -217,7 +224,7 @@ const ABILITY_DEFS=[
   {id:'kickCombo',name:'踢擊連擊',icon:'&#x1F9B6;',desc:'每選擇一次踢擊命中判定+1次，可累計',apply:h=>{h.kickBonusHits=(h.kickBonusHits||0)+1}},
   {id:'ultCombo',name:'大絕連擊數增加',icon:'&#x26A1;',desc:'每選擇一次大絕招COMBO+1，可累計',apply:h=>{h.ultBonusHits=(h.ultBonusHits||0)+1}},
   {id:'atkDamage',name:'攻擊傷害+10%',icon:'&#x1F525;',desc:'所有攻擊擊中敵人傷害+10%，可累計',apply:h=>{h.atkDmgMul=(h.atkDmgMul||1)+0.1}},
-  {id:'defense',name:'防禦+10%',icon:'&#x1F6E1;',desc:'敵人造成主角的傷害-10%，可累計',apply:h=>{h.defMul=(h.defMul||1)-0.1}}
+  {id:'defense',name:'防禦+10%',icon:'&#x1F6E1;&#xFE0F;',desc:'敵人造成主角的傷害-10%，可累計',apply:h=>{h.defMul=(h.defMul||1)-0.1}}
 ];
 
 // ============================================================
@@ -310,20 +317,21 @@ function loadHeroSprites(cb){
 function drawHero(ctx,x,y,fIdx,facing,flash,state){
   const sprites=selectedChar==='hero2'?hero2Sprites:heroSprites;
   const img=sprites[state]&&sprites[state][fIdx];
+  const flip=selectedChar==='hero2'?facing>0:facing<0;
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.translate(x,y);
-    if(facing<0)ctx.scale(-1,1);
+    if(flip)ctx.scale(-1,1);
     if(flash)ctx.globalAlpha=0.6;
     const tw=72,th=96;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const sMul=state==='punch'?0.95:1;
+    const sMul=selectedChar==='hero2'&&state==='ultimate'?1.2:selectedChar==='hero2'&&(state==='punch'||state==='walk'||state==='idle'||state==='hurt')?1.1:state==='punch'?0.95:1;
     const scale=Math.max(tw/sw,th/sh)*SCALE*0.8*sMul;
     const dw=sw*scale,dh=sh*scale;
     ctx.drawImage(img,-dw/2,-dh,dw,dh);
     ctx.restore();
   }else{
     ctx.save();ctx.translate(x,y);
-    if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*0.8,SCALE*0.8);
+    if(flip)ctx.scale(-1,1);ctx.scale(SCALE*0.8,SCALE*0.8);
     ctx.fillStyle=state==='hurt'?'#f44':selectedChar==='hero2'?'#d44':'#3a7bd5';
     ctx.fillRect(-15,-32,30,32);
     ctx.fillStyle='#f5cba7';
@@ -534,14 +542,14 @@ const GUGU_PATH='招喚姑姑技能動作包/';
 const GUGU_STATE_FILES={
   walk:['姑姑走路_1.png','姑姑走路_2.png','姑姑走路_3.png'],
   attack:['姑姑攻擊_1.png','姑姑攻擊_2.png','姑姑攻擊_3.png','姑姑攻擊_4.png'],
-  ultimate:['姑姑大絕招_1.png','姑姑大絕招_2.png','姑姑大絕招_3.png','姑姑大絕招_4.png','姑姑大絕招_5.png'],
+  ultimate:['姑姑大絕招_1.png','姑姑大絕招_2.png','姑姑大絕招_3.png','姑姑大絕招_4.png','姑姑大絕招_5.png','姑姑大絕招_6.png','姑姑大絕招_7.png','姑姑大絕招_8.png','姑姑大絕招_9.png','姑姑大絕招_10.png','姑姑大絕招_11.png','姑姑大絕招_12.png','姑姑大絕招_13.png','姑姑大絕招_14.png','姑姑大絕招_15.png'],
   hurt:['姑姑被攻擊.png'],
   death:['姑姑死亡_1.png','姑姑死亡_2.png','姑姑死亡_3.png'],
 };
 GUGU_STATE_FILES.idle=['姑姑走路_1.png','姑姑走路_2.png','姑姑走路_3.png'];
 const GUGU_ANIM={
   idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
-  attack:{frames:4,dur:10,loop:false},ultimate:{frames:5,dur:8,loop:false},
+  attack:{frames:4,dur:10,loop:false},ultimate:{frames:15,dur:6,loop:false},
   hurt:{frames:1,dur:6,loop:false},death:{frames:3,dur:12,loop:false}
 };
 function loadGuguSprites(cb){
@@ -560,20 +568,20 @@ function drawGugu(ctx,x,y,fIdx,facing,flash,state){
   const img=guguSprites[state]&&guguSprites[state][fIdx];
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.translate(x,y);
-    if(facing<0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
+    if(facing>0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const scale=Math.min(50/sw,64/sh)*SCALE*1.2;
+    const scale=Math.min(50/sw,64/sh)*SCALE*1.32;
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
-    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.2,SCALE*1.2);
+    ctx.save();ctx.translate(x,y);if(facing>0)ctx.scale(-1,1);ctx.scale(SCALE*1.32,SCALE*1.32);
     ctx.fillStyle='#f0f';ctx.fillRect(-10,-24,20,24);
     ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-30,8,0,Math.PI*2);ctx.fill();
     ctx.restore();
   }
 }
 function drawParticles(ctx,ps,camX){ps.forEach(p=>{const sx=p.x-camX;if(sx<-50||sx>CW+50)return;ctx.save();ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(sx,p.y,p.size*p.life,0,Math.PI*2);ctx.fill();ctx.restore()})}
-function drawCmb(ctx,x,y,c){ctx.save();ctx.font='bold 36px "Segoe UI",sans-serif';ctx.textAlign='center';ctx.strokeStyle='#000';ctx.lineWidth=4;ctx.strokeText(c+' COMBO!',x,y);ctx.fillStyle=c>=5?'#ff0':c>=3?'#f80':'#fff';ctx.fillText(c+' COMBO!',x,y);ctx.restore()}
+function drawCmb(ctx,x,y,c){ctx.save();ctx.font='bold 22px "Segoe UI",sans-serif';ctx.textAlign='right';ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(c+' COMBO!',x,y);ctx.fillStyle=c>=5?'#ff0':c>=3?'#f80':'#fff';ctx.fillText(c+' COMBO!',x,y);ctx.restore()}
 function drawHB(ctx,x,y,w,h,cur,mx,col,lb){const r=Math.max(0,cur/mx);ctx.fillStyle='#333';ctx.fillRect(x,y,w,h);ctx.fillStyle=col;ctx.fillRect(x+2,y+2,(w-4)*r,h-4);ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);if(lb){ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='left';ctx.fillText(lb,x+4,y+12)}}
 function drawItem(ctx,x,y,type,fi){
   const t=ITEM_CFG[type],bob=Math.sin(fi*0.05)*3;if(!t)return;
@@ -673,7 +681,7 @@ function tickAnim(e){
 // ENTITY FACTORIES
 // ============================================================
 function getHeroAnim(){
-  if(selectedChar==='hero2')return{idle:ANIM.idle,walk:ANIM.walk,punch:ANIM.punch,kick:ANIM.kick,hurt:ANIM.hurt,death:ANIM.death,ultimate:{frames:12,dur:6,loop:false}};
+  if(selectedChar==='hero2')return{idle:{frames:1,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},punch:{frames:3,dur:10,loop:false},kick:{frames:3,dur:10,loop:false},hurt:{frames:1,dur:10,loop:false},death:{frames:3,dur:20,loop:false},ultimate:{frames:12,dur:6,loop:false}};
   return ANIM;
 }
 function makeHero(){
@@ -836,56 +844,47 @@ class Game{
     if(g.hp<=0){
       if(g.animState!=='death')startAnim(g,'death');
       tickAnim(g);
-      if(g.animDone){
-        this.guguCD=1800;this.gugu=null;return;
-      }
+      if(g.animDone){this.guguCD=1800;this.gugu=null;return}
       this.applyBounds(g);return;
     }
-    if(g.hitCD>0)g.hitCD--;
-    if(g.flash>0)g.flash--;
-    if(g.hitCD>0){startAnim(g,'hurt');tickAnim(g);return}
-    if(g.atkCD>0){
-      if(!g.animDone&&g.animState==='attack'&&g.animFrame===2&&g.animTimer===GUGU_ANIM.attack.dur){
-        this.checkGuguAtk(g);
-      }
-      tickAnim(g);this.applyBounds(g);return;
-    }
-    g.healTimer--;
+    g.hitCD--;g.flash--;g.atkCD--;g.healTimer--;
     if(g.healTimer<=0){
       g.healTimer=600;
-      h.hp=Math.min(h.maxHp,h.hp+Math.floor(h.maxHp*0.3));
       startAnim(g,'ultimate');g.atkCD=GUGU_ANIM.ultimate.dur*GUGU_ANIM.ultimate.frames+5;
-      sfx('pick');this.addP(h.x,h.y-40,'#4f4',12);
-      tickAnim(g);this.applyBounds(g);return;
+      g.healing=true;sfx('pick');
     }
+    if(g.healing&&g.animDone){
+      g.healing=false;
+      h.hp=Math.min(h.maxHp,h.hp+Math.floor(h.maxHp*0.3));
+      h.flash=20;h.flashColor='#ff0';
+      for(let i=0;i<15;i++){this.pts.push({x:h.x,y:h.y-20-i*12,vy:-3-i*0.5,vx:(Math.random()-0.5)*1.5,life:1,decay:0.02,color:'#ff0',size:4+i*0.5})}
+      sfx('levelup');
+    }
+    if(g.hitCD>0&&g.animState!=='hurt')startAnim(g,'hurt');
+    if(g.atkCD>0&&g.animState==='attack'&&!g.animDone&&g.animFrame===2)this.checkGuguAtk(g);
     let nearest=null,nd=Infinity;
     this.enemies.forEach(e=>{if(e.hp>0){const d=Math.abs(e.x-g.x)+Math.abs(e.y-g.y);if(d<nd){nd=d;nearest=e}}});
     if(nearest){
       const dx=nearest.x-g.x,dy=nearest.y-g.y,dist=Math.sqrt(dx*dx+dy*dy);
       g.facing=dx>0?1:-1;
-      if(dist<60&&g.atkCD<=0){
+      if(g.atkCD<=0&&dist<80){
         startAnim(g,'attack');g.atkCD=GUGU_ANIM.attack.dur*GUGU_ANIM.attack.frames+3;sfx('hit');
-      }else if(dist>40){
-        g.vx=(dx/dist)*2.5;g.vy=(dy/dist)*2.5;
-        startAnim(g,'walk');
-      }else{
-        g.vx*=0.8;g.vy*=0.8;
-        startAnim(g,'idle');
-      }
+      }else if(dist>30){
+        g.vx=(dx/dist)*3.5;g.vy=(dy/dist)*3.5;startAnim(g,'walk');
+      }else{g.vx=0;g.vy=0}
     }else{
-      const dx=h.x+80-g.x,dy=h.y-g.y,dist=Math.sqrt(dx*dx+dy*dy);
+      const dx=h.x+50-g.x,dy=h.y-g.y,dist=Math.sqrt(dx*dx+dy*dy);
       g.facing=dx>0?1:-1;
-      if(dist>50){g.vx=(dx/dist)*2;g.vy=(dy/dist)*2;startAnim(g,'walk')}
-      else{g.vx*=0.8;g.vy*=0.8;startAnim(g,'idle')}
+      if(dist>25){g.vx=(dx/dist)*3.5;g.vy=(dy/dist)*3.5;startAnim(g,'walk')}
+      else{g.vx=0;g.vy=0;startAnim(g,'idle')}
     }
-    g.x+=g.vx;g.y+=g.vy;
     tickAnim(g);
     this.applyBounds(g);
   }
   checkGuguAtk(g){
     this.enemies.forEach(e=>{
-      if(e.hp<=0||e.hitCD>0)return;
-      if(Math.abs(e.x-g.x)<80&&Math.abs(e.y-g.y)<60&&((g.facing>0&&e.x>g.x)||(g.facing<0&&e.x<g.x))){
+      if(e.hp<=0)return;
+      if(Math.abs(e.x-g.x)<90&&Math.abs(e.y-g.y)<70){
         const dmg=15+Math.floor(Math.random()*10);
         e.hp-=dmg;e.hitCD=18;e.flash=8;e.stun=12;e.vx=0;e.vy=0;
         this.addP(e.x,e.y-30,'#f0f',6);sfx('punch');
@@ -938,7 +937,7 @@ class Game{
   updHero(){
     const h=this.hero;
     if(h.hp<=0){startAnim(h,'death');this.go=true;if(!this.lbSaved){this.lbSaved=true;addLBEntry(this.playerName,this.score)}return}
-    if(h.flash>0)h.flash--;if(h.atkCD>0)h.atkCD--;if(h.hitCD>0)h.hitCD--;if(h.itemCD>0)h.itemCD--;
+    if(h.flash>0)h.flash--;else h.flashColor=null;if(h.atkCD>0)h.atkCD--;if(h.hitCD>0)h.hitCD--;if(h.itemCD>0)h.itemCD--;
     if(h.ultCD>0)h.ultCD--;
     h.mp=Math.min(h.maxMp,h.mp+HERO.MP_REGEN);
     if(h.hitCD>0){startAnim(h,'hurt');tickAnim(h);return}
@@ -1056,7 +1055,13 @@ class Game{
     }
     if(e.flash>0)e.flash--;if(e.atkCD>0)e.atkCD--;if(e.hitCD>0)e.hitCD--;if(e.stun>0)e.stun--;
     if(e.kickCD>0)e.kickCD--;
-    const dx=this.hero.x-e.x,dy=this.hero.y-e.y,dist=Math.abs(dx),ac=e.animCfg||ANIM;
+    let tx=this.hero.x,ty=this.hero.y;
+    if(this.gugu&&this.gugu.hp>0){
+      const gh=Math.abs(this.gugu.x-e.x)+Math.abs(this.gugu.y-e.y);
+      const hh=Math.abs(this.hero.x-e.x)+Math.abs(this.hero.y-e.y);
+      if(gh<hh){tx=this.gugu.x;ty=this.gugu.y}
+    }
+    const dx=tx-e.x,dy=ty-e.y,dist=Math.abs(dx),ac=e.animCfg||ANIM;
     e.facing=dx>0?1:-1;
     if(e.hitCD>0||e.stun>0){if(e.hitCD>0)startAnim(e,'hurt');else startAnim(e,'idle');e.charging=false;tickAnim(e);return}
     if(e.type==='xiaowang'&&e.charging){
@@ -1074,8 +1079,8 @@ class Game{
       tickAnim(e);this.applyBounds(e);return;
     }
     if(e.atkCD>0){
-      if(!e.animDone&&e.animState==='attack'&&e.animFrame===2&&e.animTimer===ac.attack.dur)this.checkEnemyAtk(e);
-      if(!e.animDone&&e.animState==='kick'&&e.animFrame===1&&e.animTimer===ac.kick.dur)this.checkEnemyAtk(e);
+      if(!e.animDone&&e.animState==='attack'&&e.animFrame===2)this.checkEnemyAtk(e);
+      if(!e.animDone&&e.animState==='kick'&&e.animFrame===1)this.checkEnemyAtk(e);
       tickAnim(e);this.applyBounds(e);return
     }
     const d2=Math.sqrt(dx*dx+dy*dy);
@@ -1117,11 +1122,12 @@ class Game{
   }
   checkEnemyAtk(e){
     const h=this.hero;
-    if(this.gugu&&this.gugu.hp>0&&this.gugu.hitCD<=0){
+    if(this.gugu&&this.gugu.hp>0&&this.gugu.hitCD<=0&&this.gugu.animState!=='ultimate'){
       const g=this.gugu;
       if(Math.abs(g.x-e.x)<65&&Math.abs(g.y-e.y)<60){
         g.hp-=e.dmg;g.hitCD=20;g.flash=10;g.vx=(g.x>e.x?1:-1)*4;
-        startAnim(g,'hurt');this.addP(g.x,g.y,'#f0f',6);sfx('phit');
+        if(g.animState!=='hurt')startAnim(g,'hurt');
+        this.addP(g.x,g.y,'#f0f',6);sfx('phit');
       }
     }
     if(h.hitCD>0)return;
@@ -1192,7 +1198,13 @@ class Game{
       if(sx<-100||sx>CW+100)return;
       const fi=e.animFrame||0,fa=e.facing||1,fl=e.flash>0,st=e.animState||'idle';
       const gw=e.type==='xiaowang'&&(st==='kickfly'||e.charging);
-      if(e===this.hero)drawHero(ctx,sx,sy,fi,fa,fl,st);
+      if(e===this.hero){
+        drawHero(ctx,sx,sy,fi,fa,fl,st);
+        if(e.flash>0&&e.flashColor){
+          ctx.save();ctx.globalAlpha=0.4;ctx.fillStyle=e.flashColor;
+          ctx.fillRect(sx-36,sy-96,72,96);ctx.restore();
+        }
+      }
       else drawEnemy(ctx,sx,sy,fi,fa,fl,st,e.type,gw);
     });
     this.enemies.filter(e=>e.hp>0).forEach(e=>{
@@ -1212,8 +1224,10 @@ class Game{
     if(this.gugu&&this.gugu.hp>0){
       const g=this.gugu,gx=Math.round(g.x-this.camX),gy=Math.round(g.y);
       drawGugu(ctx,gx,gy,g.animFrame||0,g.facing||1,g.flash>0,g.animState||'idle');
-      const bw=40,bh=5,by=gy-100;
-      drawHB(ctx,gx-bw/2,by,bw,bh,g.hp,g.maxHp,'#f0f','姑姑');
+      const bw=40,bh=5;
+      ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+      ctx.fillText('姑姑',gx,gy-100);
+      drawHB(ctx,gx-bw/2,gy-115,bw,bh,g.hp,g.maxHp,'#a855f7');
     }
     if(this.gugu&&this.gugu.hp<=0&&!this.gugu.animDone){
       const g=this.gugu,gx=Math.round(g.x-this.camX),gy=Math.round(g.y);
@@ -1242,20 +1256,10 @@ class Game{
     ctx.fillText((min<10?'0':'')+min+':'+(sec<10?'0':'')+sec,CW/2,35);
     ctx.fillStyle='#ff0';ctx.font='bold 16px sans-serif';ctx.textAlign='right';
     ctx.fillText('SCORE: '+this.score,CW-20,30);
-    const ultR=h.ultCD>0?1-h.ultCD/ULT_COOLDOWN:1;
-    ctx.fillStyle='#333';ctx.fillRect(CW-70,50,50,50);
-    ctx.fillStyle=ultR>=1?'#f80':'#555';ctx.fillRect(CW-68,52,46*(ultR>=1?1:ultR),46);
-    ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.strokeRect(CW-70,50,50,50);
-    ctx.fillStyle='#fff';ctx.font='bold 18px sans-serif';ctx.textAlign='center';
-    ctx.fillText('A',CW-45,80);
-    if(h.ultCD>0){ctx.fillStyle='#ff0';ctx.font='12px sans-serif';ctx.fillText(Math.ceil(h.ultCD/60)+'s',CW-45,95)}
-    ctx.fillStyle='#fff';ctx.font='12px sans-serif';ctx.textAlign='left';
-    ctx.fillText('COMBO: '+this.cc,20,108);ctx.fillText('擊殺: '+this.kills,20,124);
-    if(h.heldItems.length){ctx.fillStyle='#ff0';ctx.font='13px sans-serif';ctx.fillText('道具['+h.heldItems.length+'/5]:',20,148);h.heldItems.forEach((it,i)=>{const yOff=164+i*16;ctx.fillStyle=i===0?'#ff0':'#aaa';ctx.fillText(ITEM_CFG[it.type].name+'('+it.uses+'回) ',22,yOff)});if(h.heldItems.length)ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.fillText('[S]使用最上方的道具',20,164+h.heldItems.length*16)}
-    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.fillRect(CW-220,110,210,100);
-    ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.textAlign='left';
-    ['↑↓←→=移動 | Z=出拳','X=踢擊 | A=大絕招(冷卻10秒)','S=使用道具 | R=重新開始','Z+X=招喚姑姑(姑姑死亡後30秒CD)'].forEach((c,i)=>ctx.fillText(c,CW-210,128+i*18));
-    if(this.cd>0&&this.cc>1)drawCmb(ctx,this.cx,this.cy,this.cc);
+    ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='right';
+    ctx.fillText('COMBO: '+this.cc,CW-20,55);ctx.fillText('擊殺: '+this.kills,CW-20,72);
+    if(h.heldItems.length){ctx.fillStyle='#ff0';ctx.font='13px sans-serif';ctx.textAlign='right';ctx.fillText('道具['+h.heldItems.length+'/5]:',CW-20,95);h.heldItems.forEach((it,i)=>{const yOff=111+i*16;ctx.fillStyle=i===0?'#ff0':'#aaa';ctx.fillText(ITEM_CFG[it.type].name+'('+it.uses+'回) ',CW-22,yOff)});if(h.heldItems.length)ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.fillText('[S]使用最上方的道具',CW-20,111+h.heldItems.length*16)}
+    if(this.cd>0&&this.cc>1)drawCmb(ctx,CW-60,55,this.cc);
     if(this.go){
       ctx.fillStyle='rgba(0,0,0,0.7)';ctx.fillRect(0,0,CW,CH);
       ctx.fillStyle='#f44';ctx.font='bold 60px sans-serif';ctx.textAlign='center';
