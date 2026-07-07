@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>小小冒險家 - 橫向卷軸動作過關</title>
+<title>官家大亂鬥 - 橫向卷軸動作過關</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a0a12;font-family:'Segoe UI','Microsoft YaHei',sans-serif}
@@ -12,7 +12,7 @@ body{display:flex;justify-content:center;align-items:center;background:radial-gr
 h1{font-size:42px;font-weight:900;margin-bottom:4px;background:linear-gradient(135deg,#f0c040,#ff6b35,#ff4444,#a855f7,#3b82f6);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 3s ease infinite;letter-spacing:4px}
 .sub{color:#888;font-size:16px;letter-spacing:2px;margin-bottom:12px}
 #border{display:inline-block;padding:4px;border-radius:8px;background:linear-gradient(135deg,#f0c040,#ff6b35,#a855f7,#3b82f6);background-size:400% 400%;animation:gradientShift 4s ease infinite}
-canvas{display:block;border-radius:6px;background:#000;width:540px;height:660px}
+canvas{display:block;border-radius:6px;background:#000;width:540px;height:600px}
 .controls{margin-top:12px;color:#888;font-size:12px}
 .controls span{display:inline-block;background:rgba(255,255,255,0.05);padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.1);animation:fadeIn 0.8s ease-out 0.6s both;line-height:1.8}
 @keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -65,7 +65,7 @@ canvas{display:block;border-radius:6px;background:#000;width:540px;height:660px}
 .btn-s{left:44px;bottom:0;background:rgba(100,200,100,0.4)}
 .btn-r{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);background:rgba(200,200,200,0.35);font-size:11px;width:40px;height:26px;border-radius:13px;color:#fff;display:flex;justify-content:center;align-items:center;user-select:none;-webkit-user-select:none;touch-action:none;border:1px solid rgba(255,255,255,0.3);pointer-events:auto}
 .btn-r:active{opacity:0.7}
-@media(max-width:1000px){canvas{width:100%;height:auto;aspect-ratio:16/9}}
+@media(max-width:1000px){canvas{width:100%;height:auto;aspect-ratio:9/10}}
 @media(pointer:coarse){#mobileControls{display:block}#leaderboardBtn{display:block}}
 #loadingOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#111;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:100;transition:opacity 0.5s}
 #loadingOverlay.hide{opacity:0;pointer-events:none}
@@ -78,10 +78,10 @@ canvas{display:block;border-radius:6px;background:#000;width:540px;height:660px}
 </head>
 <body>
 <div id="wrapper">
-<h1>&#x2694; 小小冒險家 &#x2694;</h1>
+<h1>&#x2694; 官家大亂鬥 &#x2694;</h1>
 <p class="sub">道路大亂鬥 &mdash; LF2 風格</p>
 <div id="loadingOverlay"><div id="loadingText">LOADING...</div><div id="loadingBar"><div id="loadingFill"></div></div></div>
-<div id="border"><canvas id="game" width="540" height="660"></canvas></div>
+<div id="border"><canvas id="game" width="540" height="600"></canvas></div>
 <p class="controls"><span>
 ↑↓←→=自由行走 | Z=出拳 | X=踢擊 | A=大絕招(冷卻10秒) | S=使用道具 | Z+X=招喚姑姑 | R=重新開始
 </span></p>
@@ -165,11 +165,11 @@ canvas{display:block;border-radius:6px;background:#000;width:540px;height:660px}
 // ============================================================
 // CONSTANTS
 // ============================================================
-const CW=540,CH=660,ROAD_TOP=270,ROAD_BOTTOM=640,LEVEL_LEN=4000;
+const CW=540,CH=600,ROAD_TOP=250,ROAD_BOTTOM=580,LEVEL_LEN=4000;
 const KEY={L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',D:'ArrowDown',P:'z',K:'x',A:'a',S:'s'};
 const HERO={HP:500,MP:200,SPD:3.5,JUMP:-9,W:40,H:64,ATK_RNG:100,ATK_DMG:25,MP_REGEN:0.2};
 const SCALE=1.56;
-const XP_KILL={xiaoguai1:10,xiaoguai2:20,xiaoguai3:30,xiaoguai4:35,xiaowang:50};
+const XP_KILL={xiaoguai1:10,xiaoguai2:20,xiaoguai3:30,xiaoguai4:35,xiaowang:50,xiaowang2:60};
 const XP_PER_LEVEL=100;
 const ULT_COOLDOWN=600;
 const GAME_TIME=300;
@@ -193,7 +193,11 @@ const ENEMY_CFG={
     anim:{idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
       attack:{frames:4,dur:10,loop:false},kick:{frames:3,dur:10,loop:false},
       kickfly:{frames:7,dur:10,loop:false},
-      hurt:{frames:1,dur:6,loop:false},death:{frames:1,dur:10,loop:false}}}
+      hurt:{frames:1,dur:6,loop:false},death:{frames:1,dur:10,loop:false}}},
+  xiaowang2:{name:'小王2',HP:1200,SPD:0.9,DMG:25,W:50,H:70,col:'#f80',
+    anim:{idle:{frames:3,dur:15,loop:true},walk:{frames:3,dur:15,loop:true},
+      attack:{frames:3,dur:15,loop:false},kickfly:{frames:9,dur:15,loop:false},
+      hurt:{frames:1,dur:15,loop:false},death:{frames:3,dur:15,loop:false}}}
 };
 const ITEM_CFG={
   health:{name:'回血瓶',col:'#4c4',uses:1,dmg:0,throw:false,heal:true},
@@ -531,11 +535,53 @@ function drawXiaowang(ctx,x,y,fIdx,facing,flash,state,glow){
     ctx.restore();
   }
 }
+const xiaowang2Sprites={};
+const XIAOWANG2_PATH='小王2動作包/';
+const XIAOWANG2_STATE_FILES={
+  walk:['小王2走路_1.png','小王2走路_2.png','小王2走路_3.png'],
+  attack:['小王攻擊_1.png','小王攻擊_2.png','小王攻擊_3.png'],
+  kickfly:['小王踢飛_1.png','小王踢飛_2.png','小王踢飛_3.png','小王踢飛_4.png','小王踢飛_5.png','小王踢飛_6.png','小王踢飛_7.png','小王踢飛_8.png','小王踢飛_9.png'],
+  hurt:['小王2被攻擊.png'],
+  death:['小王2死亡_1.png','小王2死亡_2.png','小王2死亡_3.png'],
+};
+XIAOWANG2_STATE_FILES.idle=['小王2走路_1.png','小王2走路_2.png','小王2走路_3.png'];
+function loadXiaowang2Sprites(cb){
+  let loaded=0,total=0;
+  Object.keys(XIAOWANG2_STATE_FILES).forEach(state=>{
+    xiaowang2Sprites[state]=[];
+    XIAOWANG2_STATE_FILES[state].forEach((f,i)=>{
+      total++;const img=new Image();
+      img.onload=()=>{loaded++;if(loaded>=total)cb()};
+      img.onerror=()=>{loaded++;if(loaded>=total)cb()};
+      img.src=XIAOWANG2_PATH+f;xiaowang2Sprites[state][i]=img;
+    });
+  });
+}
+function drawXiaowang2(ctx,x,y,fIdx,facing,flash,state,glow){
+  const img=xiaowang2Sprites[state]&&xiaowang2Sprites[state][fIdx];
+  if(img&&img.complete&&img.naturalWidth>0){
+    ctx.save();ctx.translate(x,y);
+    if(facing<0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
+    if(glow){ctx.shadowColor='#f80';ctx.shadowBlur=25;}
+    const sw=img.naturalWidth,sh=img.naturalHeight;
+    const sMul=state==='kickfly'?1.3:1;
+    const scale=Math.min(55/sw,75/sh)*SCALE*1.2*sMul;
+    ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
+    ctx.restore();
+  }else{
+    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.2,SCALE*1.2);
+    if(glow){ctx.shadowColor='#f80';ctx.shadowBlur=25;}
+    ctx.fillStyle='#f80';ctx.fillRect(-12,-28,24,28);
+    ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-34,10,0,Math.PI*2);ctx.fill();
+    ctx.restore();
+  }
+}
 function drawEnemy(ctx,x,y,fIdx,facing,flash,state,type,glow){
   if(type==='xiaoguai2')drawXiaoguai2(ctx,x,y,fIdx,facing,flash,state);
   else if(type==='xiaoguai3')drawXiaoguai3(ctx,x,y,fIdx,facing,flash,state);
   else if(type==='xiaoguai4')drawXiaoguai4(ctx,x,y,fIdx,facing,flash,state);
   else if(type==='xiaowang')drawXiaowang(ctx,x,y,fIdx,facing,flash,state,glow);
+  else if(type==='xiaowang2')drawXiaowang2(ctx,x,y,fIdx,facing,flash,state,glow);
   else drawXiaoguai1(ctx,x,y,fIdx,facing,flash,state);
 }
 const guguSprites={};
@@ -934,10 +980,10 @@ class Game{
     this.spawnTimer=SPAWN_INTERVAL;
     const alive=this.enemies.filter(e=>e.hp>0);
     if(alive.length>=MAX_ENEMIES)return;
-    const bossCount=alive.filter(e=>e.type==='xiaowang').length;
+    const bossCount=alive.filter(e=>e.type==='xiaowang'||e.type==='xiaowang2').length;
     if(bossCount>=MAX_BOSSES)return;
     const types=['xiaoguai1','xiaoguai2','xiaoguai3','xiaoguai4'];
-    if(bossCount<MAX_BOSSES)types.push('xiaowang');
+    if(bossCount<MAX_BOSSES)types.push('xiaowang','xiaowang2');
     const type=types[Math.floor(Math.random()*types.length)];
     const side=Math.random()<0.5?1:-1;
     const sx=side>0?this.hero.x+800+Math.random()*200:this.hero.x-300-Math.random()*200;
@@ -1089,16 +1135,17 @@ class Game{
     const dx=tx-e.x,dy=ty-e.y,dist=Math.abs(dx),ac=e.animCfg||ANIM;
     e.facing=dx>0?1:-1;
     if(e.hitCD>0||e.stun>0){if(e.hitCD>0)startAnim(e,'hurt');else startAnim(e,'idle');e.charging=false;tickAnim(e);return}
-    if(e.type==='xiaowang'&&e.charging){
+    if((e.type==='xiaowang'||e.type==='xiaowang2')&&e.charging){
       e.vx=0;e.vy=0;e.chargeTimer--;
       if(e.chargeTimer<=0){e.charging=false;startAnim(e,'kickfly');e.kickHits=0}
       tickAnim(e);this.applyBounds(e);return;
     }
-    if(e.type==='xiaowang'&&e.animState==='kickfly'&&!e.animDone){
+    if((e.type==='xiaowang'||e.type==='xiaowang2')&&e.animState==='kickfly'&&!e.animDone){
       e.vx=0;e.vy=0;
-      const kickDmg=[1,2,3,4,6];
+      const kickDmg=e.type==='xiaowang2'?[1,2,3,4,5,6,7,8]:[1,2,3,4,6];
+      const finalFrame=e.type==='xiaowang2'?8:6;
       if(kickDmg.includes(e.animFrame)&&e.animTimer===ac.kickfly.dur){
-        const isFinal=e.animFrame===6;
+        const isFinal=e.animFrame===finalFrame;
         this.checkBossKickfly(e,isFinal);
       }
       tickAnim(e);this.applyBounds(e);return;
@@ -1115,7 +1162,7 @@ class Game{
       if(d2<400)e.entered=true;
     }else if(dist<550){
       if(dist<55&&e.atkCD<=0){
-        if(e.type==='xiaowang'&&(e.atkCount||0)>=10){
+        if((e.type==='xiaowang'||e.type==='xiaowang2')&&(e.atkCount||0)>=10){
           e.atkCount=0;e.charging=true;e.chargeTimer=30;e.vx=0;e.vy=0;
           startAnim(e,'idle');tickAnim(e);this.applyBounds(e);return;
         }else if(e.type==='xiaowang'){
@@ -1134,7 +1181,7 @@ class Game{
   checkBossKickfly(e,isFinal){
     const h=this.hero;
     if(h.hitCD>0)return;
-    const atkRange=e.type==='xiaowang'?85:65;
+    const atkRange=(e.type==='xiaowang'||e.type==='xiaowang2')?85:65;
     if(Math.abs(h.x-e.x)<atkRange&&Math.abs(h.y-e.y)<60){
       const rawDmg=isFinal?e.dmg*2:e.dmg;
       const dmg=Math.floor(rawDmg*(h.defMul||1));
@@ -1159,7 +1206,7 @@ class Game{
     if(Math.abs(h.x-e.x)<65&&Math.abs(h.y-e.y)<60){
       const dmg=Math.floor(e.dmg*(h.defMul||1));
       h.hp-=dmg;h.hitCD=20;h.flash=10;h.vy=-6;h.vx=(h.x>e.x?1:-1)*6;this.shake=Math.min(this.shake+3,8);
-      if(e.type==='xiaowang')e.atkCount=(e.atkCount||0)+1;
+      if(e.type==='xiaowang'||e.type==='xiaowang2')e.atkCount=(e.atkCount||0)+1;
       startAnim(h,'hurt');
       this.addP(h.x,h.y,'#f44',8);sfx('phit');this.cc=0
     }
@@ -1231,7 +1278,7 @@ class Game{
       const sx=Math.round(e.x-this.camX),sy=Math.round(e.y);
       if(sx<-100||sx>CW+100)return;
       const fi=e.animFrame||0,fa=e.facing||1,fl=e.flash>0,st=e.animState||'idle';
-      const gw=e.type==='xiaowang'&&(st==='kickfly'||e.charging);
+      const gw=(e.type==='xiaowang'||e.type==='xiaowang2')&&(st==='kickfly'||e.charging);
       if(e===this.hero){
         drawHero(ctx,sx,sy,fi,fa,fl,st);
         if(this.healFx&&this.healFx.active)drawHealFx(ctx,sx,sy,this.healFx.frame,SCALE);
@@ -1245,7 +1292,7 @@ class Game{
     this.enemies.filter(e=>e.hp>0).forEach(e=>{
       const sx=Math.round(e.x-this.camX),sy=Math.round(e.y);
       if(sx<-100||sx>CW+100)return;
-      const bw=Math.min(e.w+10,46),bh=5,by=sy-(e.type==='xiaowang'?155:e.type==='xiaoguai3'?140:e.type==='xiaoguai4'?145:e.type==='xiaoguai2'?165:110);
+      const bw=Math.min(e.w+10,46),bh=5,by=sy-(e.type==='xiaowang'||e.type==='xiaowang2'?155:e.type==='xiaoguai3'?140:e.type==='xiaoguai4'?145:e.type==='xiaoguai2'?165:110);
       drawHB(ctx,sx-bw/2,by,bw,bh,e.hp,e.maxHp,e.hp/e.maxHp>0.5?'#4c4':e.hp/e.maxHp>0.25?'#ea0':'#e44');
     });
     this.items.forEach(i=>{if(!i.picked){const ix=Math.round(i.x-this.camX);if(ix>-50&&ix<CW+50)drawItem(ctx,ix,i.y,i.t,this.frame)}});
@@ -1326,7 +1373,7 @@ class Game{
 // ============================================================
 const canvas=document.getElementById('game');
 function resize(){
-  const mw=Math.min(window.innerWidth-40,540),r=660/540;
+  const mw=Math.min(window.innerWidth-40,540),r=600/540;
   canvas.style.width=mw+'px';canvas.style.height=(mw*r)+'px'
 }
 window.addEventListener('resize',resize);resize();
@@ -1353,7 +1400,7 @@ function selectCharacter(ch){
     let progress=0;
     function setProgress(p){progress=p;if(fill)fill.style.width=p+'%'}
     setProgress(10);
-    loadHeroSprites(()=>{setProgress(18);loadHero2Sprites(()=>{setProgress(32);loadHealFxSprites(()=>{setProgress(40);loadXiaoguai1Sprites(()=>{setProgress(48);loadXiaoguai2Sprites(()=>{setProgress(56);loadXiaoguai3Sprites(()=>{setProgress(63);loadXiaoguai4Sprites(()=>{setProgress(71);loadXiaowangSprites(()=>{setProgress(79);loadGuguSprites(()=>{setProgress(87);loadSceneImages(()=>{setProgress(94);loadItemImages(()=>{
+    loadHeroSprites(()=>{setProgress(18);loadHero2Sprites(()=>{setProgress(32);loadHealFxSprites(()=>{setProgress(40);loadXiaoguai1Sprites(()=>{setProgress(48);loadXiaoguai2Sprites(()=>{setProgress(56);loadXiaoguai3Sprites(()=>{setProgress(63);loadXiaoguai4Sprites(()=>{setProgress(71);loadXiaowangSprites(()=>{setProgress(76);loadXiaowang2Sprites(()=>{setProgress(79);loadGuguSprites(()=>{setProgress(84);loadSceneImages(()=>{setProgress(90);loadItemImages(()=>{
       setProgress(100);
       if(overlay)overlay.classList.add('hide');
       setTimeout(()=>{if(overlay)overlay.style.display='none'},600);
