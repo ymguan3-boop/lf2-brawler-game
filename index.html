@@ -570,7 +570,7 @@ function drawGugu(ctx,x,y,fIdx,facing,flash,state){
     ctx.save();ctx.translate(x,y);
     if(facing>0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const scale=Math.min(50/sw,64/sh)*SCALE*1.32*(state==='ultimate'?1.3:1);
+    const scale=Math.min(50/sw,64/sh)*SCALE*1.32*(state==='ultimate'?1.69:1);
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
@@ -598,7 +598,7 @@ function drawHealFx(ctx,x,y,fIdx,scale){
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.globalAlpha=0.6;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const s=Math.max(72/sw,96/sh)*scale*1.6;
+    const s=Math.max(72/sw,96/sh)*scale*2.4;
     ctx.drawImage(img,x-sw*s/2,y-sh*s,sw*s,sh*s);
     ctx.restore();
   }
@@ -880,6 +880,7 @@ class Game{
       h.hp=Math.min(h.maxHp,h.hp+Math.floor(h.maxHp*0.3));
       h.flash=20;h.flashColor='#ff0';
       this.healFx={frame:0,timer:HEAL_FX_DUR,active:true};
+      g.animState='idle';g.animDone=false;
       sfx('levelup');
     }
     if(g.hitCD>0&&g.animState!=='hurt')startAnim(g,'hurt');
