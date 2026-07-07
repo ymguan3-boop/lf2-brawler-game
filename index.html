@@ -79,7 +79,7 @@ canvas{display:block;border-radius:6px;background:#000;width:540px;height:600px}
 <body>
 <div id="wrapper">
 <h1>&#x2694; 官家大亂鬥 &#x2694;</h1>
-<p class="sub">道路大亂鬥 &mdash; LF2 風格</p>
+<p class="sub">製作人:官毅明</p>
 <div id="loadingOverlay"><div id="loadingText">LOADING...</div><div id="loadingBar"><div id="loadingFill"></div></div></div>
 <div id="border"><canvas id="game" width="540" height="600"></canvas></div>
 <p class="controls"><span>
@@ -192,7 +192,7 @@ const ENEMY_CFG={
   xiaowang:{name:'小王',HP:800,SPD:0.8,DMG:20,W:50,H:70,col:'#f44',
     anim:{idle:{frames:3,dur:14,loop:true},walk:{frames:3,dur:7,loop:true},
       attack:{frames:4,dur:10,loop:false},kick:{frames:3,dur:10,loop:false},
-      kickfly:{frames:7,dur:10,loop:false},
+      kickfly:{frames:7,dur:15,loop:false},
       hurt:{frames:1,dur:6,loop:false},death:{frames:1,dur:10,loop:false}}},
   xiaowang2:{name:'小王2',HP:1200,SPD:0.9,DMG:25,W:50,H:70,col:'#f80',
     anim:{idle:{frames:3,dur:15,loop:true},walk:{frames:3,dur:15,loop:true},
@@ -1135,6 +1135,16 @@ class Game{
     const dx=tx-e.x,dy=ty-e.y,dist=Math.abs(dx),ac=e.animCfg||ANIM;
     e.facing=dx>0?1:-1;
     if(e.hitCD>0||e.stun>0){if(e.hitCD>0)startAnim(e,'hurt');else startAnim(e,'idle');e.charging=false;tickAnim(e);return}
+    if((e.type==='xiaowang'||e.type==='xiaowang2')&&e.hp>0&&e.hitCD<=0&&e.stun<=0){
+      e.kickflyTimer=(e.kickflyTimer||(e.type==='xiaowang'?1800:1500))-1;
+      if(e.kickflyTimer<=0){
+        e.kickflyTimer=e.type==='xiaowang'?1800:1500;
+        if(!e.charging&&e.animState!=='kickfly'){
+          e.charging=true;e.chargeTimer=30;e.vx=0;e.vy=0;
+          startAnim(e,'idle');tickAnim(e);this.applyBounds(e);return;
+        }
+      }
+    }
     if((e.type==='xiaowang'||e.type==='xiaowang2')&&e.charging){
       e.vx=0;e.vy=0;e.chargeTimer--;
       if(e.chargeTimer<=0){e.charging=false;startAnim(e,'kickfly');e.kickHits=0}
@@ -1142,8 +1152,8 @@ class Game{
     }
     if((e.type==='xiaowang'||e.type==='xiaowang2')&&e.animState==='kickfly'&&!e.animDone){
       e.vx=0;e.vy=0;
-      const kickDmg=e.type==='xiaowang2'?[1,2,3,4,5,6,7,8]:[1,2,3,4,6];
-      const finalFrame=e.type==='xiaowang2'?8:6;
+      const kickDmg=e.type==='xiaowang2'?[1,2,3,4]:[1,2,3,4,6];
+      const finalFrame=e.type==='xiaowang2'?4:6;
       if(kickDmg.includes(e.animFrame)&&e.animTimer===ac.kickfly.dur){
         const isFinal=e.animFrame===finalFrame;
         this.checkBossKickfly(e,isFinal);
