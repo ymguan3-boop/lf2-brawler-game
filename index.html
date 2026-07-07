@@ -598,7 +598,7 @@ function drawHealFx(ctx,x,y,fIdx,scale){
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.globalAlpha=0.6;
     const sw=img.naturalWidth,sh=img.naturalHeight;
-    const s=Math.max(72/sw,96/sh)*scale*0.8;
+    const s=Math.max(72/sw,96/sh)*scale*1.6;
     ctx.drawImage(img,x-sw*s/2,y-sh*s,sw*s,sh*s);
     ctx.restore();
   }
@@ -884,6 +884,7 @@ class Game{
     }
     if(g.hitCD>0&&g.animState!=='hurt')startAnim(g,'hurt');
     if(g.atkCD>0&&g.animState==='attack'&&!g.animDone&&g.animFrame===2)this.checkGuguAtk(g);
+    if(g.animState==='ultimate'||g.animState==='death'){tickAnim(g);this.applyBounds(g);return}
     let nearest=null,nd=Infinity;
     this.enemies.forEach(e=>{if(e.hp>0){const d=Math.abs(e.x-g.x)+Math.abs(e.y-g.y);if(d<nd){nd=d;nearest=e}}});
     if(nearest){
