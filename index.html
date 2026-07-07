@@ -446,11 +446,11 @@ function drawXiaoguai3(ctx,x,y,fIdx,facing,flash,state){
     if(facing<0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     const sw=img.naturalWidth,sh=img.naturalHeight;
     const sMul=state==='walk'||state==='idle'?0.8:1;
-    const scale=Math.min(50/sw,64/sh)*SCALE*1.56*sMul;
+    const scale=Math.min(50/sw,64/sh)*SCALE*1.56*1.1*sMul;
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
-    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.56,SCALE*1.56);
+    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.56*1.1,SCALE*1.56*1.1);
     ctx.fillStyle='#fa0';ctx.fillRect(-10,-24,20,24);
     ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-30,8,0,Math.PI*2);ctx.fill();
     ctx.restore();
@@ -561,7 +561,7 @@ function drawXiaowang2(ctx,x,y,fIdx,facing,flash,state,glow){
   const img=xiaowang2Sprites[state]&&xiaowang2Sprites[state][fIdx];
   if(img&&img.complete&&img.naturalWidth>0){
     ctx.save();ctx.translate(x,y);
-    if(facing<0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
+    if(facing>0)ctx.scale(-1,1);if(flash)ctx.globalAlpha=0.5;
     if(glow){ctx.shadowColor='#f80';ctx.shadowBlur=25;}
     const sw=img.naturalWidth,sh=img.naturalHeight;
     const sMul=state==='kickfly'?1.3:1;
@@ -569,7 +569,7 @@ function drawXiaowang2(ctx,x,y,fIdx,facing,flash,state,glow){
     ctx.drawImage(img,-sw*scale/2,-sh*scale,sw*scale,sh*scale);
     ctx.restore();
   }else{
-    ctx.save();ctx.translate(x,y);if(facing<0)ctx.scale(-1,1);ctx.scale(SCALE*1.2,SCALE*1.2);
+    ctx.save();ctx.translate(x,y);if(facing>0)ctx.scale(-1,1);ctx.scale(SCALE*1.2,SCALE*1.2);
     if(glow){ctx.shadowColor='#f80';ctx.shadowBlur=25;}
     ctx.fillStyle='#f80';ctx.fillRect(-12,-28,24,28);
     ctx.fillStyle='#ff0';ctx.beginPath();ctx.arc(0,-34,10,0,Math.PI*2);ctx.fill();
@@ -1162,12 +1162,21 @@ class Game{
       if(d2<400)e.entered=true;
     }else if(dist<550){
       if(dist<55&&e.atkCD<=0){
-        if((e.type==='xiaowang'||e.type==='xiaowang2')&&(e.atkCount||0)>=10){
+        if(e.type==='xiaowang'&&(e.atkCount||0)>=3){
+          e.atkCount=0;
+          if((e.kickCount||0)>=2){
+            e.kickCount=0;e.charging=true;e.chargeTimer=30;e.vx=0;e.vy=0;
+            startAnim(e,'idle');tickAnim(e);this.applyBounds(e);return;
+          }else{
+            e.kickCount=(e.kickCount||0)+1;
+            startAnim(e,'kick');e.atkCD=ac.kick.dur*ac.kick.frames+50;
+          }
+        }else if(e.type==='xiaowang2'&&(e.atkCount||0)>=6){
           e.atkCount=0;e.charging=true;e.chargeTimer=30;e.vx=0;e.vy=0;
           startAnim(e,'idle');tickAnim(e);this.applyBounds(e);return;
-        }else if(e.type==='xiaowang'){
-          const move=Math.random()<0.5?'attack':'kick';
-          startAnim(e,move);e.atkCD=ac[move].dur*ac[move].frames+50;
+        }else if(e.type==='xiaowang'||e.type==='xiaowang2'){
+          e.atkCount=(e.atkCount||0)+1;
+          startAnim(e,'attack');e.atkCD=ac.attack.dur*ac.attack.frames+50;
         }else{
           startAnim(e,'attack');e.atkCD=ac.attack.dur*ac.attack.frames+50;
         }
@@ -1206,7 +1215,6 @@ class Game{
     if(Math.abs(h.x-e.x)<65&&Math.abs(h.y-e.y)<60){
       const dmg=Math.floor(e.dmg*(h.defMul||1));
       h.hp-=dmg;h.hitCD=20;h.flash=10;h.vy=-6;h.vx=(h.x>e.x?1:-1)*6;this.shake=Math.min(this.shake+3,8);
-      if(e.type==='xiaowang'||e.type==='xiaowang2')e.atkCount=(e.atkCount||0)+1;
       startAnim(h,'hurt');
       this.addP(h.x,h.y,'#f44',8);sfx('phit');this.cc=0
     }
