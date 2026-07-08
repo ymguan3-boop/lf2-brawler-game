@@ -645,7 +645,7 @@ function drawHealFx(ctx,x,y,fIdx,scale){
   }
 }
 function drawParticles(ctx,ps,camX){ps.forEach(p=>{const sx=p.x-camX;if(sx<-50||sx>CW+50)return;ctx.save();ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(sx,p.y,p.size*p.life,0,Math.PI*2);ctx.fill();ctx.restore()})}
-function drawCmb(ctx,x,y,c){ctx.save();ctx.font='bold 22px "Segoe UI",sans-serif';ctx.textAlign='right';ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(c+' COMBO!',x,y);ctx.fillStyle=c>=5?'#ff0':c>=3?'#f80':'#fff';ctx.fillText(c+' COMBO!',x,y);ctx.restore()}
+function drawCmb(ctx,x,y,c){ctx.save();ctx.font='bold 22px "Segoe UI",sans-serif';ctx.textAlign='right';ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeText(c+' COMBO!',x,y);ctx.fillStyle='#f44';ctx.fillText(c+' COMBO!',x,y);ctx.restore()}
 function drawHB(ctx,x,y,w,h,cur,mx,col,lb){const r=Math.max(0,cur/mx);ctx.fillStyle='#333';ctx.fillRect(x,y,w,h);ctx.fillStyle=col;ctx.fillRect(x+2,y+2,(w-4)*r,h-4);ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.strokeRect(x,y,w,h);if(lb){ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='left';ctx.fillText(lb,x+4,y+12)}}
 function drawItem(ctx,x,y,type,fi){
   const t=ITEM_CFG[type],bob=Math.sin(fi*0.05)*3;if(!t)return;
@@ -1365,27 +1365,27 @@ class Game{
     }
     drawParticles(ctx,this.pts,this.camX);
     const h=this.hero;
-    drawHB(ctx,20,20,220,24,h.hp,h.maxHp,'#e74c3c','HP');
+    drawHB(ctx,20,20,147,16,h.hp,h.maxHp,'#e74c3c','HP');
     const ultMax=ULT_COOLDOWN,ultCur=h.ultCD>0?ULT_COOLDOWN-h.ultCD:ULT_COOLDOWN;
-    drawHB(ctx,20,50,150,16,ultCur,ultMax,h.ultCD<=0?'#f80':'#888','CD');
-    const xpR=h.xpToNext>0?h.xp/h.xpToNext:0;
-    drawHB(ctx,20,72,150,12,h.xp,h.xpToNext,'#9b59b6','XP');
-    ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='left';
-    ctx.fillText('Lv.'+h.level,178,82);
-    ctx.fillText(' '+h.playerName,178,82);
+    drawHB(ctx,20,42,100,11,ultCur,ultMax,h.ultCD<=0?'#f80':'#888','CD');
+    drawHB(ctx,20,58,100,8,h.xp,h.xpToNext,'#9b59b6','XP');
+    ctx.fillStyle='#fff';ctx.font='bold 11px sans-serif';ctx.textAlign='left';
+    ctx.fillText('Lv.'+h.level,128,66);
+    ctx.fillText(' '+h.playerName,128,66);
     if(this.guguCD>0){
-      drawHB(ctx,20,90,150,10,1800-this.guguCD,1800,'#f0f','姑姑CD');
-      ctx.fillStyle='#f0f';ctx.font='11px sans-serif';ctx.fillText(Math.ceil(this.guguCD/60)+'s',175,99);
+      drawHB(ctx,20,72,100,8,1800-this.guguCD,1800,'#f0f','姑姑CD');
+      ctx.fillStyle='#f0f';ctx.font='10px sans-serif';ctx.fillText(Math.ceil(this.guguCD/60)+'s',125,79);
     }else if(!this.gugu||this.gugu.hp<=0){
-      ctx.fillStyle='#f0f';ctx.font='bold 11px sans-serif';ctx.fillText('姑姑可招喚(Z+X)',20,99);
+      ctx.fillStyle='#f0f';ctx.font='bold 10px sans-serif';ctx.fillText('姑姑可招喚(Z+X)',20,79);
     }
     const min=Math.floor(this.timeLeft/60),sec=this.timeLeft%60;
     ctx.fillStyle=this.timeLeft<=30?'#f44':'#fff';ctx.font='bold 24px sans-serif';ctx.textAlign='center';
     ctx.fillText((min<10?'0':'')+min+':'+(sec<10?'0':'')+sec,CW/2,35);
     ctx.fillStyle='#ff0';ctx.font='bold 16px sans-serif';ctx.textAlign='right';
     ctx.fillText('SCORE: '+this.score,CW-20,30);
-    ctx.fillStyle='#fff';ctx.font='bold 12px sans-serif';ctx.textAlign='right';
-    ctx.fillText('COMBO: '+this.cc,CW-20,55);ctx.fillText('擊殺: '+this.kills,CW-20,72);
+    ctx.fillStyle='#f44';ctx.font='bold 12px sans-serif';ctx.textAlign='right';
+    ctx.fillText('COMBO: '+this.cc,CW-20,55);
+    ctx.fillStyle='#a855f7';ctx.fillText('擊殺: '+this.kills,CW-20,72);
     if(h.heldItems.length){ctx.fillStyle='#ff0';ctx.font='13px sans-serif';ctx.textAlign='right';ctx.fillText('道具['+h.heldItems.length+'/5]:',CW-20,95);h.heldItems.forEach((it,i)=>{const yOff=111+i*16;ctx.fillStyle=i===0?'#ff0':'#aaa';ctx.fillText(ITEM_CFG[it.type].name+'('+it.uses+'回) ',CW-22,yOff)});if(h.heldItems.length)ctx.fillStyle='#aaa';ctx.font='11px sans-serif';ctx.fillText('[S]使用最上方的道具',CW-20,111+h.heldItems.length*16)}
     if(this.cd>0&&this.cc>1)drawCmb(ctx,CW-60,55,this.cc);
     if(this.go){
