@@ -852,9 +852,9 @@ class Game{
     let jid=null;
     const clearJoy=()=>{jid=null;self.keys[KEY.U]=false;self.keys[KEY.D]=false;self.keys[KEY.L]=false;self.keys[KEY.R]=false;knob.style.transform='translate(0,0)'};
     const handleJoy=e=>{
+      if(e.type==='touchstart'){if(e.target!==joystick&&!joystick.contains(e.target))return;jid=e.changedTouches[0].identifier}
+      if(jid===null&&e.type!=='touchstart')return;
       e.preventDefault();
-      if(e.type==='touchstart')jid=e.changedTouches[0].identifier;
-      if(!jid&&e.type!=='touchstart')return;
       const t=e.type==='touchstart'?e.changedTouches[0]:[...e.changedTouches].find(t=>t.identifier===jid);
       if(!t)return;
       if(e.type==='touchend'||e.type==='touchcancel'){clearJoy();return}
@@ -871,19 +871,31 @@ class Game{
         else self.keys[KEY.L]=true;
       }
     };
-    joystick.addEventListener('touchstart',handleJoy);
-    joystick.addEventListener('touchmove',handleJoy);
-    joystick.addEventListener('touchend',handleJoy);
-    joystick.addEventListener('touchcancel',handleJoy);
+    joystick.addEventListener('touchstart',handleJoy,{passive:false});
+    document.addEventListener('touchmove',handleJoy,{passive:false});
+    document.addEventListener('touchend',handleJoy,{passive:false});
+    document.addEventListener('touchcancel',handleJoy,{passive:false});
     document.querySelectorAll('.act-btn').forEach(btn=>{
       const key=btn.dataset.key;
+      let bid=null;
       btn.addEventListener('touchstart',e=>{
-        e.preventDefault();
+        if(e.target!==btn&&!btn.contains(e.target))return;
+        e.preventDefault();bid=e.changedTouches[0].identifier;
         if(key==='gugu'){self.keys['z']=true;self.keys['x']=true}
         else{self.keys[key]=true;if(key==='r')showNameModal()}
-      });
-      btn.addEventListener('touchend',e=>{e.preventDefault();if(key==='gugu'){self.keys['z']=false;self.keys['x']=false}else self.keys[key]=false});
-      btn.addEventListener('touchcancel',e=>{e.preventDefault();if(key==='gugu'){self.keys['z']=false;self.keys['x']=false}else self.keys[key]=false});
+      },{passive:false});
+      document.addEventListener('touchend',e=>{
+        if(bid===null)return;
+        const t=[...e.changedTouches].find(t=>t.identifier===bid);
+        if(!t)return;bid=null;e.preventDefault();
+        if(key==='gugu'){self.keys['z']=false;self.keys['x']=false}else self.keys[key]=false
+      },{passive:false});
+      document.addEventListener('touchcancel',e=>{
+        if(bid===null)return;
+        const t=[...e.changedTouches].find(t=>t.identifier===bid);
+        if(!t)return;bid=null;e.preventDefault();
+        if(key==='gugu'){self.keys['z']=false;self.keys['x']=false}else self.keys[key]=false
+      },{passive:false});
     });
   }
   bufCheck(...ks){for(let i=this.buf.length-1;i>=0;i--){if(ks.includes(this.buf[i].k)&&this.frame-this.buf[i].t<10){this.buf.splice(i,1);return true}}return false}
