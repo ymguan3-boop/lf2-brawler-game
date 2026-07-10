@@ -86,12 +86,13 @@ canvas{display:block;border-radius:6px;background:#000;width:540px;height:600px}
 <!-- Name Input Modal -->
 <div id="nameModal" class="modal-overlay active">
 <div class="modal-box">
-<h2>&#x2694; 小小冒險家 &#x2694;</h2>
+<h2>&#x2694; 官家大亂鬥 &#x2694;</h2>
 <p style="color:#aaa;margin-bottom:20px">請輸入你的名字開始遊戲</p>
 <input type="text" id="playerNameInput" placeholder="輸入玩家姓名" maxlength="12" autocomplete="off">
 <br><br>
 <button id="startBtn" onclick="goToCharSelect()">開始遊戲</button>
-<div style="margin-top:20px;padding:12px;background:rgba(255,255,255,0.08);border-radius:8px;text-align:left;font-size:12px;color:#aaa;line-height:1.8">
+<div id="nameRankList" style="margin-top:16px;max-height:240px;overflow-y:auto;text-align:left"></div>
+<div style="margin-top:16px;padding:12px;background:rgba(255,255,255,0.08);border-radius:8px;text-align:left;font-size:12px;color:#aaa;line-height:1.8">
 <div>↑↓←→ = 自由行走</div>
 <div>Z = 出拳 | X = 踢擊</div>
 <div>A = 大絕招（冷卻10秒）</div>
@@ -766,28 +767,34 @@ function makeEnemy(type,x,side){
 }
 
 // ============================================================
-// LEADERBOARD
+// SUPABASE LEADERBOARD
 // ============================================================
-const LB_KEY='lf2_leaderboard';
-function getLB(){try{return JSON.parse(localStorage.getItem(LB_KEY))||[]}catch(e){return[]}}
-function saveLB(list){try{localStorage.setItem(LB_KEY,JSON.stringify(list))}catch(e){}}
-function addLBEntry(name,score){
-  const list=getLB();
-  list.push({name,score,date:new Date().toLocaleDateString()});
-  list.sort((a,b)=>b.score-a.score);
-  if(list.length>10)list.length=10;
-  saveLB(list);
+const SUPABASE_URL='https://iusqlofwemapccdnzjge.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c3Fsb2Z3ZW1hcGNjZG56amdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NTc5ODUsImV4cCI6MjA5OTIzMzk4NX0._PTXgboyfI0zmIGrLUrjNQbuAXCk1xdqU1KHPdRvl7o';
+const sbHdrs={apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY};
+async function fetchLB(){try{const r=await fetch(SUPABASE_URL+'/rest/v1/leaderboard?select=name,score&order=score.desc&limit=10',{headers:sbHdrs});return r.ok?await r.json():[]}catch(e){return[]}}
+async function saveScore(name,score){
+  try{
+    await fetch(SUPABASE_URL+'/rest/v1/leaderboard',{method:'POST',headers:{'Content-Type':'application/json',...sbHdrs},body:JSON.stringify({name,score})});
+    const r=await fetch(SUPABASE_URL+'/rest/v1/leaderboard?select=id&order=score.desc',{headers:sbHdrs});
+    if(r.ok){const rows=await r.json();if(rows.length>10)for(const id of rows.slice(10).map(r=>r.id))await fetch(SUPABASE_URL+'/rest/v1/leaderboard?id=eq.'+id,{method:'DELETE',headers:sbHdrs})}
+  }catch(e){}
 }
+function addLBEntry(name,score){saveScore(name,score)}
 function showLB(){
-  const list=getLB();
-  const el=document.getElementById('lbContent');
-  if(!list.length){el.innerHTML='<p style="color:#888;padding:20px">尚無紀錄</p>';}
-  else{
-    el.innerHTML=list.map((e,i)=>`<div class="lb-row"><span class="rank">#${i+1}</span><span class="name">${e.name}</span><span class="score">${e.score}</span><span class="date">${e.date}</span></div>`).join('');
-  }
-  document.getElementById('lbModal').classList.add('active');
+  fetchLB().then(list=>{
+    const el=document.getElementById('lbContent');
+    if(!list.length)el.innerHTML='<p style="color:#888;padding:20px">尚無紀錄</p>';
+    else el.innerHTML=list.map((e,i)=>`<div class="lb-row"><span class="rank">#${i+1}</span><span class="name">${e.name}</span><span class="score">${e.score}</span></div>`).join('');
+    document.getElementById('lbModal').classList.add('active');
+  });
 }
 function closeLB(){document.getElementById('lbModal').classList.remove('active')}
+async function renderNameRank(){
+  const list=await fetchLB();
+  const el=document.getElementById('nameRankList');
+  if(!list.length){el.innerHTML='';return}
+  el.innerHTML='<div style="color:#f0c040;font-size:13px;font-weight:bold;margin-bottom:6px;text-align:center">&#x1F3C6; 排行榜 TOP 10</div>'+list.map((e,i)=>`<div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid rgba(255,255,255,0.06);color:#ccc;font-size:12px"><span style="color:${i===0?'#f0c040':i===1?'#c0c0c0':i===2?'#cd7f32':'#888'};width:30px">#${i+1}</span><span style="flex:1;color:#fff">${e.name}</span><span style="width:60px;text-align:right;color:#ff0">${e.score}</span></div>`).join('')
 
 // ============================================================
 // LEVEL UP CARDS
@@ -1466,6 +1473,7 @@ function showNameModal(){
   document.getElementById('playerNameInput').value='';
   document.getElementById('playerNameInput').style.borderColor='#555';
   document.getElementById('leaderboardBtn').style.display='none';
+  renderNameRank();
   if(gameInstance){gameInstance.stop();gameInstance=null}
 }
 document.getElementById('playerNameInput').addEventListener('keydown',e=>{
@@ -1473,6 +1481,7 @@ document.getElementById('playerNameInput').addEventListener('keydown',e=>{
   e.stopPropagation();
 });
 document.getElementById('leaderboardBtn').style.display='none';
+renderNameRank();
 </script>
 </body>
 </html>
