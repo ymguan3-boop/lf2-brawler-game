@@ -794,7 +794,8 @@ async function renderNameRank(){
   const list=await fetchLB();
   const el=document.getElementById('nameRankList');
   if(!list.length){el.innerHTML='';return}
-  el.innerHTML='<div style="color:#f0c040;font-size:13px;font-weight:bold;margin-bottom:6px;text-align:center">&#x1F3C6; 排行榜 TOP 10</div>'+list.map((e,i)=>`<div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid rgba(255,255,255,0.06);color:#ccc;font-size:12px"><span style="color:${i===0?'#f0c040':i===1?'#c0c0c0':i===2?'#cd7f32':'#888'};width:30px">#${i+1}</span><span style="flex:1;color:#fff">${e.name}</span><span style="width:60px;text-align:right;color:#ff0">${e.score}</span></div>`).join('')
+  el.innerHTML='<div style="color:#f0c040;font-size:13px;font-weight:bold;margin-bottom:6px;text-align:center">&#x1F3C6; 排行榜 TOP 10</div>'+list.map((e,i)=>`<div style="display:flex;justify-content:space-between;padding:3px 8px;border-bottom:1px solid rgba(255,255,255,0.06);color:#ccc;font-size:12px"><span style="color:${i===0?'#f0c040':i===1?'#c0c0c0':i===2?'#cd7f32':'#888'};width:30px">#${i+1}</span><span style="flex:1;color:#fff">${e.name}</span><span style="width:60px;text-align:right;color:#ff0">${e.score}</span></div>`).join('');
+}
 
 // ============================================================
 // LEVEL UP CARDS
