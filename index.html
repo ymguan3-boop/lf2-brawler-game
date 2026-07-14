@@ -1083,7 +1083,7 @@ class Game{
       startAnim(h,'punch',null,punchDur);h.atkCD=Math.floor((punchDur*ANIM.punch.frames+3)/h.punchSpdMul);sfx('punch');
       if(h.punchSpdMul>1.0&&QIGONG_IMGS['氣功特效_2.png']){
         const imgKey=h.punchSpdMul>=1.3?'氣功特效_3.png':'氣功特效_2.png';
-        this.projs.push({x:h.x+h.facing*50,y:h.y-20,vx:h.facing*10,vy:0,type:'qigong',col:imgKey,life:120,dmg:Math.floor(25*h.atkDmgMul)});
+        this.projs.push({x:h.x+h.facing*50,y:h.y-25,vx:h.facing*10,vy:0,type:'qigong',col:imgKey,life:120,dmg:Math.floor(25*h.atkDmgMul)});
       }
     }
     if(h.atkCD>0&&!h.animDone&&h.animState==='punch'&&h.hitCD<=0){
