@@ -625,6 +625,7 @@ function drawGugu(ctx,x,y,fIdx,facing,flash,state){
 const healFxSprites=[];
 const HEAL_FX_PATH='特效包/';
 const HEAL_FX_FILES=['回血特效_1.png','回血特效_2.png','回血特效_3.png','回血特效_4.png','回血特效_5.png','回血特效_6.png'];
+const QIGONG_IMGS={};
 const HEAL_FX_DUR=4;const HEAL_FX_FRAMES=6;
 function loadHealFxSprites(cb){
   let loaded=0;
@@ -633,6 +634,15 @@ function loadHealFxSprites(cb){
     img.onload=()=>{loaded++;if(loaded>=HEAL_FX_FRAMES)cb()};
     img.onerror=()=>{loaded++;if(loaded>=HEAL_FX_FRAMES)cb()};
     img.src=HEAL_FX_PATH+f;healFxSprites[i]=img;
+  });
+}
+function loadQigongImages(cb){
+  let loaded=0,total=2;
+  ['氣功特效_2.png','氣功特效_3.png'].forEach(f=>{
+    const img=new Image();
+    img.onload=()=>{loaded++;if(loaded>=total)cb()};
+    img.onerror=()=>{loaded++;if(loaded>=total)cb()};
+    img.src=HEAL_FX_PATH+f;QIGONG_IMGS[f]=img;
   });
 }
 function drawHealFx(ctx,x,y,fIdx,scale){
@@ -662,6 +672,15 @@ function drawItem(ctx,x,y,type,fi){
   }
   ctx.restore()}
 function drawProj(ctx,x,y,type,col,rot){
+  if(type==='qigong'){
+    const img=QIGONG_IMGS[col];ctx.save();
+    if(img&&img.complete&&img.naturalWidth>0){
+      const sw=img.naturalWidth,sh=img.naturalHeight;
+      const s=Math.max(48/sw,48/sh)*SCALE*0.8;
+      ctx.drawImage(img,x-sw*s/2,y-sh*s/2,sw*s,sh*s);
+    }
+    ctx.restore();return
+  }
   const img=itemImgs[type];
   ctx.save();ctx.translate(x,y);ctx.rotate(rot||0);
   if(img&&img.complete&&img.naturalWidth>0){
@@ -1061,7 +1080,11 @@ class Game{
     }
     const punchDur=Math.floor(ANIM.punch.dur*h.punchSpdMul);
     if(this.keys[KEY.P]&&h.atkCD<=0){
-      startAnim(h,'punch',null,punchDur);h.atkCD=Math.floor((punchDur*ANIM.punch.frames+3)/h.punchSpdMul);sfx('punch')
+      startAnim(h,'punch',null,punchDur);h.atkCD=Math.floor((punchDur*ANIM.punch.frames+3)/h.punchSpdMul);sfx('punch');
+      if(h.punchSpdMul>1.0&&QIGONG_IMGS['氣功特效_2.png']){
+        const imgKey=h.punchSpdMul>=1.3?'氣功特效_3.png':'氣功特效_2.png';
+        this.projs.push({x:h.x+h.facing*50,y:h.y-20,vx:h.facing*10,vy:0,type:'qigong',col:imgKey,life:120,dmg:Math.floor(25*h.atkDmgMul)});
+      }
     }
     if(h.atkCD>0&&!h.animDone&&h.animState==='punch'&&h.hitCD<=0){
       if(h.animFrame===1&&h.animTimer===punchDur)this.checkAtkHit(h,Math.floor(HERO.ATK_DMG*h.atkDmgMul));
@@ -1267,7 +1290,25 @@ class Game{
   }
   updProjs(){
     this.projs.forEach(p=>{
-      if(p.type==='knife'){
+      if(p.type==='qigong'){
+        p.x+=p.vx;p.life--;
+        const img=QIGONG_IMGS[p.col];
+        const hitW=img&&img.complete&&img.naturalWidth>0?img.naturalWidth*Math.max(48/img.naturalWidth,48/img.naturalHeight)*SCALE*0.8:30;
+        const hitH=img&&img.complete&&img.naturalHeight>0?img.naturalHeight*Math.max(48/img.naturalWidth,48/img.naturalHeight)*SCALE*0.8:30;
+        this.enemies.forEach(e=>{
+          if(e.hp<=0)return;
+          if(Math.abs(p.x-e.x)<(hitW+e.w)/2+5&&Math.abs(p.y-e.y)<hitH/2+20){
+            e.hp-=p.dmg;e.hitCD=15;e.flash=8;e.stun=10;e.vx=0;e.vy=0;
+            const ctX=(p.x+e.x)/2,ctY=(p.y+e.y)/2;
+            this.addP(ctX,ctY,'#fff',10);this.addP(ctX,ctY,'#4df',8);this.addP(ctX,ctY,'#8ef',6);
+            this.shake=Math.min(this.shake+3,8);sfx('hit');
+            this.cc++;this.ct=60;this.cd=45;this.cx=ctX-this.camX;this.cy=ctY-20;
+            if(e.hp<=0)this.onEnemyKill(e);
+          }
+        });
+        p.life=Math.min(p.life,90);
+        if(p.x<-50||p.x>LEVEL_LEN+50)p.life=0;
+      }else if(p.type==='knife'){
         p.x+=p.vx;p.rot+=0.3;p.life--;
         this.enemies.forEach(e=>{
           if(e.hp<=0)return;
@@ -1454,7 +1495,7 @@ function selectCharacter(ch){
     let progress=0;
     function setProgress(p){progress=p;if(fill)fill.style.width=p+'%'}
     setProgress(10);
-    loadHeroSprites(()=>{setProgress(18);loadHero2Sprites(()=>{setProgress(32);loadHealFxSprites(()=>{setProgress(40);loadXiaoguai1Sprites(()=>{setProgress(48);loadXiaoguai2Sprites(()=>{setProgress(56);loadXiaoguai3Sprites(()=>{setProgress(63);loadXiaoguai4Sprites(()=>{setProgress(71);loadXiaowangSprites(()=>{setProgress(76);loadXiaowang2Sprites(()=>{setProgress(79);loadGuguSprites(()=>{setProgress(84);loadSceneImages(()=>{setProgress(90);loadItemImages(()=>{
+    loadHeroSprites(()=>{setProgress(16);loadHero2Sprites(()=>{setProgress(28);loadHealFxSprites(()=>{setProgress(34);loadQigongImages(()=>{setProgress(38);loadXiaoguai1Sprites(()=>{setProgress(44);loadXiaoguai2Sprites(()=>{setProgress(50);loadXiaoguai3Sprites(()=>{setProgress(56);loadXiaoguai4Sprites(()=>{setProgress(62);loadXiaowangSprites(()=>{setProgress(68);loadXiaowang2Sprites(()=>{setProgress(72);loadGuguSprites(()=>{setProgress(78);loadSceneImages(()=>{setProgress(86);loadItemImages(()=>{
       setProgress(100);
       if(overlay)overlay.classList.add('hide');
       setTimeout(()=>{if(overlay)overlay.style.display='none'},600);
