@@ -1292,10 +1292,10 @@ class Game{
     this.projs.forEach(p=>{
       if(p.type==='qigong'){
         p.x+=p.vx;p.life--;
-        const hitW=77,hitH=107;
+        const hitW=77,hitH=77;
         this.enemies.forEach(e=>{
           if(e.hp<=0)return;
-          if(Math.abs(p.x-e.x)<(hitW+e.w)/2+5&&Math.abs(p.y-e.y)<hitH/2+20){
+          if(Math.abs(p.x-e.x)<(hitW+e.w)/2+5&&e.y-p.y<hitH/2+20&&p.y-e.y<hitH/2+20+15){
             e.hp-=p.dmg;e.hitCD=15;e.flash=8;e.stun=10;e.vx=0;e.vy=0;
             const ctX=(p.x+e.x)/2,ctY=(p.y+e.y)/2;
             this.addP(ctX,ctY,'#fff',10);this.addP(ctX,ctY,'#4df',8);this.addP(ctX,ctY,'#8ef',6);
