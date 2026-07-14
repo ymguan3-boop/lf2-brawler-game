@@ -671,13 +671,14 @@ function drawItem(ctx,x,y,type,fi){
     ctx.fillStyle=t.col;ctx.beginPath();ctx.arc(0,-8,8,0,Math.PI*2);ctx.fill();
   }
   ctx.restore()}
-function drawProj(ctx,x,y,type,col,rot,sMul){
+function drawProj(ctx,x,y,type,col,rot,sMul,fa){
   if(type==='qigong'){
     const img=QIGONG_IMGS[col];ctx.save();
     if(img&&img.complete&&img.naturalWidth>0){
       const sw=img.naturalWidth,sh=img.naturalHeight;
       const s=Math.max(48/sw,48/sh)*SCALE*0.8*(sMul||1);
-      ctx.drawImage(img,x-sw*s/2,y-sh*s/2,sw*s,sh*s);
+      if(fa>0){ctx.translate(x,y);ctx.scale(-1,1);ctx.drawImage(img,-sw*s/2,-sh*s/2,sw*s,sh*s)}
+      else ctx.drawImage(img,x-sw*s/2,y-sh*s/2,sw*s,sh*s);
     }
     ctx.restore();return
   }
@@ -1083,7 +1084,7 @@ class Game{
       startAnim(h,'punch',null,punchDur);h.atkCD=Math.floor((punchDur*ANIM.punch.frames+3)/h.punchSpdMul);sfx('punch');
       if(h.punchSpdMul>1.0&&QIGONG_IMGS['氣功特效_2.png']){
         const imgKey=h.punchSpdMul>=1.3?'氣功特效_3.png':'氣功特效_2.png';
-        this.projs.push({x:h.x+h.facing*50,y:h.y-77,vx:h.facing*10,vy:0,type:'qigong',col:imgKey,life:120,dmg:Math.floor(25*h.atkDmgMul),sMul:h.punchSpdMul>=1.3?1.5:1});
+        this.projs.push({x:h.x+h.facing*50,y:h.y-77,vx:h.facing*10,vy:0,type:'qigong',col:imgKey,life:120,dmg:Math.floor(25*h.atkDmgMul),sMul:h.punchSpdMul>=1.3?1.5:1,fa:h.facing});
       }
     }
     if(h.atkCD>0&&!h.animDone&&h.animState==='punch'&&h.hitCD<=0){
@@ -1389,7 +1390,7 @@ class Game{
       drawHB(ctx,sx-bw/2,by,bw,bh,e.hp,e.maxHp,e.hp/e.maxHp>0.5?'#4c4':e.hp/e.maxHp>0.25?'#ea0':'#e44');
     });
     this.items.forEach(i=>{if(!i.picked){const ix=Math.round(i.x-this.camX);if(ix>-50&&ix<CW+50)drawItem(ctx,ix,i.y,i.t,this.frame)}});
-    this.projs.forEach(p=>{const px=Math.round(p.x-this.camX);if(px>-50&&px<CW+50)drawProj(ctx,px,p.y,p.type,p.col,p.rot||0,p.sMul||1)});
+    this.projs.forEach(p=>{const px=Math.round(p.x-this.camX);if(px>-50&&px<CW+50)drawProj(ctx,px,p.y,p.type,p.col,p.rot||0,p.sMul||1,p.fa||0)});
     this.enemies.filter(e=>e.hp<=0&&!e.animDone).forEach(e=>{
       const sx=Math.round(e.x-this.camX),sy=Math.round(e.y);ctx.globalAlpha=0.3;
       const fi=e.animFrame||0,fa=e.facing||1;
