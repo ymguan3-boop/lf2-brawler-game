@@ -1,7 +1,7 @@
 # ⚔ 官家大亂鬥 — LF2 風格橫版格鬥遊戲
 
 > **靈感來源**：《小朋友齊打交 2》(Little Fighter 2)
-> **開發工具**：Claude Code (opencode) + HTML5 Canvas + JavaScript + Supabase
+> **開發工具**：Claude Code (opencode) + HTML5 Canvas + JavaScript + Firebase Firestore
 > **素材工具**：ChatGPT Image 2.0 + 多宮格圖片自動裁切與去背器
 > **遊玩網址**：https://ymguan3-boop.github.io/lf2-brawler-game/
 > **GitHub**：https://github.com/ymguan3-boop/lf2-brawler-game
@@ -32,7 +32,7 @@
 - 🎮 **直式手機優化** — 9:10 畫面比例 + 虛擬搖桿 + 觸控按鈕
 - 👊 **流暢戰鬥** — 出拳、踢擊、大絕招（冷卻10秒）、道具投擲
 - 🆙 **升級系統** — 擊敗敵人獲得經驗值，升級可選擇能力卡片
-- 🏆 **排行榜** — 分數自動記錄至 Supabase，TOP 10 排名
+- 🏆 **排行榜** — 分數自動記錄至 Firebase Firestore，TOP 10 排名
 - 🤖 **多種敵人** — 小怪1/2/3/4、小王、小王2，各有不同 AI
 - 👩 **招喚姑姑** — Z+X 組合鍵招喚 AI 夥伴輔助戰鬥
 - 💥 **氣功波** — 升級出拳加速後，每次出拳發射氣功波
@@ -168,11 +168,11 @@
 - AI 攻擊計數器（非隨機）
 - 時間定時踢飛機制（小王30s、小王2 25s）
 
-### 階段 14：Supabase 排行榜
+### 階段 14：排行榜（localStorage）
 
-> **提示詞**：*「設定 Supabase 資料庫，讓玩家分數自動記錄並維持 TOP 10」*
+> **提示詞**：*「設定資料庫，讓玩家分數自動記錄並維持 TOP 10」*
 
-- Supabase REST API 串接
+- 初期以 localStorage 儲存分數
 - 自動寫入分數 + 清理 10 名以外資料
 - 排行榜即時顯示
 
@@ -184,6 +184,17 @@
 - punchSpdMul≥1.3 切換進階特效（1.5x放大）
 - 77px 攻擊判定範圍
 - 擊中怪物 COMBO +1
+
+### 階段 16：Firebase Firestore 排行榜
+
+> **背景**：原 Supabase 專案（`iusqlofwemapccdnzjge`）已刪除過期，DNS 解析失敗，排行榜失效。
+
+- 遷移至 **Firebase Firestore**（Standard 版，nam5），專案名 `guanfight`
+- 使用 **Firestore REST API**（`firestore.googleapis.com/v1/projects/.../documents`），不引入額外 SDK，維持單一 HTML
+- `leaderboard` collection：`name`（string）+ `score`（integer）
+- 讀取：`runQuery` 依 `score` 降冪排序，取 TOP 10
+- 寫入：POST 新文件後重新查詢，刪除第 10 名以外的文件
+- 安全規則目前設為公開讀寫（`allow read, write: if true`），正式上線前建議收緊
 
 ---
 
@@ -231,7 +242,7 @@
 
 - **前端**：HTML5 Canvas + Vanilla JavaScript（單一 HTML 檔案）
 - **音效**：Web Audio API（合成音效）
-- **後端**：Supabase（排行榜資料庫）
+- **後端**：Firebase Firestore（排行榜資料庫，REST API）
 - **動畫**：Sprite 幀動畫系統
 - **物理**：AABB 碰撞 + 重力 + 反彈
 - **鏡頭**：平滑跟隨 + 視差滾動背景
@@ -311,4 +322,4 @@ cd lf2-brawler-game
 
 ---
 
-*最後更新：2026年7月*
+*最後更新：2026年8月*
